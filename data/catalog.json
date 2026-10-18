@@ -1,0 +1,931 @@
+[
+  {
+    "id": "cat-001",
+    "type": "heat_pump",
+    "manufacturer": "Mitsubishi Electric",
+    "model": "Ecodan 5kW Monobloc",
+    "manufacturerArticleNo": "PUZ-WM50VHA",
+    "specs": {
+      "heatingCapacityKw": 5.0,
+      "refrigerant": "R32",
+      "phase": "single"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-001.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-10421"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-002",
+    "type": "heat_pump",
+    "manufacturer": "Mitsubishi Electric",
+    "model": "Ecodan 8.5kW Monobloc",
+    "manufacturerArticleNo": "PUZ-WM85VAA",
+    "specs": {
+      "heatingCapacityKw": 8.5,
+      "refrigerant": "R32",
+      "phase": "single"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-002.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-10422"
+      }
+    },
+    "supplierAliases": [
+      {
+        "supplier": "Northbridge Renewables Supply",
+        "code": "NB-HP-40312",
+        "description": "MITSU ECODAN 8.5KW MONO ASHP R32"
+      }
+    ],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-003",
+    "type": "heat_pump",
+    "manufacturer": "Mitsubishi Electric",
+    "model": "Ecodan 11.2kW Monobloc",
+    "manufacturerArticleNo": "PUZ-WM112VAA",
+    "specs": {
+      "heatingCapacityKw": 11.2,
+      "refrigerant": "R32",
+      "phase": "single"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-003.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-10423"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-004",
+    "type": "heat_pump",
+    "manufacturer": "Daikin",
+    "model": "Altherma 3 R Monobloc 6kW",
+    "manufacturerArticleNo": "EDLA06E3V3",
+    "specs": {
+      "heatingCapacityKw": 6.0,
+      "refrigerant": "R32",
+      "phase": "single",
+      "maxFlowTempC": 60
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-004.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-20811"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-005",
+    "type": "heat_pump",
+    "manufacturer": "Daikin",
+    "model": "Altherma 3 R Monobloc 8kW",
+    "manufacturerArticleNo": "EDLA08E3V3",
+    "specs": {
+      "heatingCapacityKw": 8.0,
+      "refrigerant": "R32",
+      "phase": "single",
+      "maxFlowTempC": 60
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-005.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-20812"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-006",
+    "type": "heat_pump",
+    "manufacturer": "Daikin",
+    "model": "Altherma 3 H HT Monobloc 8kW",
+    "manufacturerArticleNo": "EBBH08D6V",
+    "specs": {
+      "heatingCapacityKw": 8.0,
+      "refrigerant": "R32",
+      "phase": "single",
+      "maxFlowTempC": 70
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-006.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-20840"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-007",
+    "type": "heat_pump",
+    "manufacturer": "Vaillant",
+    "model": "aroTHERM plus 5kW",
+    "manufacturerArticleNo": "0010021116",
+    "specs": {
+      "heatingCapacityKw": 5.0,
+      "refrigerant": "R290",
+      "phase": "single"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-007.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-31105"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-008",
+    "type": "heat_pump",
+    "manufacturer": "Vaillant",
+    "model": "aroTHERM plus 7kW",
+    "manufacturerArticleNo": "0010021118",
+    "specs": {
+      "heatingCapacityKw": 7.0,
+      "refrigerant": "R290",
+      "phase": "single"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-008.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-31107"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-009",
+    "type": "heat_pump",
+    "manufacturer": "Vaillant",
+    "model": "aroTHERM plus 10kW",
+    "manufacturerArticleNo": "0010021120",
+    "specs": {
+      "heatingCapacityKw": 10.0,
+      "refrigerant": "R290",
+      "phase": "single"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-009.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-31110"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-010",
+    "type": "heat_pump",
+    "manufacturer": "Samsung",
+    "model": "EHS Mono R290 8kW",
+    "manufacturerArticleNo": "AE080CXYDEK",
+    "specs": {
+      "heatingCapacityKw": 8.0,
+      "refrigerant": "R290",
+      "phase": "single"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-010.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-40208"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-011",
+    "type": "heat_pump",
+    "manufacturer": "Grant",
+    "model": "Aerona3 R32 10kW",
+    "manufacturerArticleNo": "HPID10R32",
+    "specs": {
+      "heatingCapacityKw": 10.0,
+      "refrigerant": "R32",
+      "phase": "single"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-011.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {
+      "UK": {
+        "mcsCertificate": "MCS-HP-50110"
+      }
+    },
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-012",
+    "type": "hot_water_cylinder",
+    "manufacturer": "Telford",
+    "model": "Tempest Heat Pump Cylinder 210L",
+    "manufacturerArticleNo": "TSMI210/HP",
+    "specs": {
+      "capacityLitres": 210,
+      "vented": false
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-012.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-013",
+    "type": "hot_water_cylinder",
+    "manufacturer": "Telford",
+    "model": "Tempest Heat Pump Cylinder 250L",
+    "manufacturerArticleNo": "TSMI250/HP",
+    "specs": {
+      "capacityLitres": 250,
+      "vented": false
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-013.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-014",
+    "type": "hot_water_cylinder",
+    "manufacturer": "Telford",
+    "model": "Tempest Heat Pump Cylinder 300L",
+    "manufacturerArticleNo": "TSMI300/HP",
+    "specs": {
+      "capacityLitres": 300,
+      "vented": false
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-014.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-015",
+    "type": "hot_water_cylinder",
+    "manufacturer": "Mixergy",
+    "model": "Mixergy X Heat Pump Cylinder 210L",
+    "manufacturerArticleNo": "MX-HP-210",
+    "specs": {
+      "capacityLitres": 210,
+      "vented": false,
+      "smart": true
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-015.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-016",
+    "type": "battery",
+    "manufacturer": "GivEnergy",
+    "model": "All in One 13.5kWh",
+    "manufacturerArticleNo": "GIV-AIO-13.5",
+    "specs": {
+      "capacityKwh": 13.5,
+      "chemistry": "LFP",
+      "continuousPowerKw": 6.0
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-016.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [
+      {
+        "supplier": "Northbridge Renewables Supply",
+        "code": "NB-BT-22018",
+        "description": "GIVENERGY AIO 13.5KWH BATTERY"
+      }
+    ],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-017",
+    "type": "battery",
+    "manufacturer": "GivEnergy",
+    "model": "Giv-Bat 9.5kWh",
+    "manufacturerArticleNo": "GIV-BAT-9.5",
+    "specs": {
+      "capacityKwh": 9.5,
+      "chemistry": "LFP"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-017.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-018",
+    "type": "battery",
+    "manufacturer": "Tesla",
+    "model": "Powerwall 3",
+    "manufacturerArticleNo": "1707000-xx-y",
+    "specs": {
+      "capacityKwh": 13.5,
+      "chemistry": "LFP",
+      "continuousPowerKw": 11.5
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-018.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-019",
+    "type": "battery",
+    "manufacturer": "Fox ESS",
+    "model": "EP11 Battery 10.36kWh",
+    "manufacturerArticleNo": "FOX-EP11",
+    "specs": {
+      "capacityKwh": 10.36,
+      "chemistry": "LFP"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-019.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-020",
+    "type": "battery",
+    "manufacturer": "Fox ESS",
+    "model": "EP5 Battery 5.18kWh",
+    "manufacturerArticleNo": "FOX-EP5",
+    "specs": {
+      "capacityKwh": 5.18,
+      "chemistry": "LFP"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-020.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-021",
+    "type": "battery",
+    "manufacturer": "Huawei",
+    "model": "LUNA2000 5kWh Module",
+    "manufacturerArticleNo": "LUNA2000-5-S0",
+    "specs": {
+      "capacityKwh": 5.0,
+      "chemistry": "LFP"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-021.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-022",
+    "type": "battery",
+    "manufacturer": "BYD",
+    "model": "Battery-Box Premium HVS 7.7",
+    "manufacturerArticleNo": "BYD-HVS-7.7",
+    "specs": {
+      "capacityKwh": 7.68,
+      "chemistry": "LFP"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-022.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-023",
+    "type": "inverter",
+    "manufacturer": "GivEnergy",
+    "model": "Gen3 Hybrid Inverter 5kW",
+    "manufacturerArticleNo": "GIV-HY5.0",
+    "specs": {
+      "acPowerKw": 5.0,
+      "hybrid": true,
+      "mppts": 2
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-023.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [
+      {
+        "supplier": "Northbridge Renewables Supply",
+        "code": "NB-IN-60122",
+        "description": "GIVENERGY GEN3 HYBRID 5KW"
+      }
+    ],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-024",
+    "type": "inverter",
+    "manufacturer": "SolarEdge",
+    "model": "Home Hub Inverter 6kW",
+    "manufacturerArticleNo": "SE6000H-RWS",
+    "specs": {
+      "acPowerKw": 6.0,
+      "hybrid": true
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-024.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-025",
+    "type": "inverter",
+    "manufacturer": "Huawei",
+    "model": "SUN2000 5kW Hybrid",
+    "manufacturerArticleNo": "SUN2000-5KTL-L1",
+    "specs": {
+      "acPowerKw": 5.0,
+      "hybrid": true,
+      "mppts": 2
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-025.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-026",
+    "type": "inverter",
+    "manufacturer": "Fox ESS",
+    "model": "H1 Hybrid 5kW",
+    "manufacturerArticleNo": "H1-5.0-E",
+    "specs": {
+      "acPowerKw": 5.0,
+      "hybrid": true,
+      "mppts": 2
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-026.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-027",
+    "type": "inverter",
+    "manufacturer": "Fronius",
+    "model": "Primo GEN24 5.0 Plus",
+    "manufacturerArticleNo": "4,210,071",
+    "specs": {
+      "acPowerKw": 5.0,
+      "hybrid": true,
+      "mppts": 2
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-027.pdf",
+    "markets": [
+      "DACH",
+      "IT",
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-028",
+    "type": "inverter",
+    "manufacturer": "SMA",
+    "model": "Sunny Boy 5.0",
+    "manufacturerArticleNo": "SB5.0-1AV-41",
+    "specs": {
+      "acPowerKw": 5.0,
+      "hybrid": false,
+      "mppts": 2
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-028.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-029",
+    "type": "pv_module",
+    "manufacturer": "Aiko",
+    "model": "Neostar 2P 450W Full Black",
+    "manufacturerArticleNo": "AIKO-A450-MAH54Db",
+    "specs": {
+      "powerWp": 450,
+      "cellType": "ABC",
+      "efficiencyPct": 23.0
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-029.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [
+      {
+        "supplier": "Northbridge Renewables Supply",
+        "code": "NB-PV-30441",
+        "description": "AIKO NEOSTAR 2P 450W BLK FR"
+      }
+    ],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-030",
+    "type": "pv_module",
+    "manufacturer": "JA Solar",
+    "model": "DeepBlue 4.0 440W",
+    "manufacturerArticleNo": "JAM54D40-440/LB",
+    "specs": {
+      "powerWp": 440,
+      "cellType": "n-type TOPCon",
+      "efficiencyPct": 22.5
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-030.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-031",
+    "type": "pv_module",
+    "manufacturer": "LONGi",
+    "model": "Hi-MO 6 435W",
+    "manufacturerArticleNo": "LR5-54HTH-435M",
+    "specs": {
+      "powerWp": 435,
+      "cellType": "HPBC",
+      "efficiencyPct": 22.3
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-031.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-032",
+    "type": "pv_module",
+    "manufacturer": "Trina Solar",
+    "model": "Vertex S+ 445W",
+    "manufacturerArticleNo": "TSM-445NEG9R.28",
+    "specs": {
+      "powerWp": 445,
+      "cellType": "n-type TOPCon",
+      "efficiencyPct": 22.3
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-032.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-033",
+    "type": "optimiser",
+    "manufacturer": "Tigo",
+    "model": "TS4-A-O Optimiser 700W",
+    "manufacturerArticleNo": "TS4-A-O",
+    "specs": {
+      "maxPowerW": 700
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-033.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-034",
+    "type": "optimiser",
+    "manufacturer": "SolarEdge",
+    "model": "S440 Power Optimiser",
+    "manufacturerArticleNo": "S440-1GM4MRM",
+    "specs": {
+      "maxPowerW": 440
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-034.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-035",
+    "type": "ev_charger",
+    "manufacturer": "myenergi",
+    "model": "zappi 7kW Untethered White",
+    "manufacturerArticleNo": "ZAPPI-2H07UW",
+    "specs": {
+      "powerKw": 7.4,
+      "tethered": false,
+      "colour": "white",
+      "solarDiversion": true
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-035.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-036",
+    "type": "ev_charger",
+    "manufacturer": "myenergi",
+    "model": "zappi 7kW Untethered Black",
+    "manufacturerArticleNo": "ZAPPI-2H07UB",
+    "specs": {
+      "powerKw": 7.4,
+      "tethered": false,
+      "colour": "black",
+      "solarDiversion": true
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-036.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-037",
+    "type": "ev_charger",
+    "manufacturer": "myenergi",
+    "model": "zappi 7kW Tethered Black",
+    "manufacturerArticleNo": "ZAPPI-2H07TB",
+    "specs": {
+      "powerKw": 7.4,
+      "tethered": true,
+      "cableLengthM": 6.5,
+      "colour": "black",
+      "solarDiversion": true
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-037.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-038",
+    "type": "ev_charger",
+    "manufacturer": "Ohme",
+    "model": "Home Pro 7kW Tethered 8m",
+    "manufacturerArticleNo": "OHME-HP-8M",
+    "specs": {
+      "powerKw": 7.4,
+      "tethered": true,
+      "cableLengthM": 8
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-038.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-039",
+    "type": "ev_charger",
+    "manufacturer": "Ohme",
+    "model": "Home Pro 7kW Tethered 5m",
+    "manufacturerArticleNo": "OHME-HP-5M",
+    "specs": {
+      "powerKw": 7.4,
+      "tethered": true,
+      "cableLengthM": 5
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-039.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-040",
+    "type": "ev_charger",
+    "manufacturer": "Hypervolt",
+    "model": "Home 3 Pro 7kW",
+    "manufacturerArticleNo": "HV-H3P-7",
+    "specs": {
+      "powerKw": 7.4,
+      "tethered": true,
+      "cableLengthM": 5
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-040.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-041",
+    "type": "ev_charger",
+    "manufacturer": "Wallbox",
+    "model": "Pulsar Plus 7kW",
+    "manufacturerArticleNo": "PLP1-0-2-4-9-002",
+    "specs": {
+      "powerKw": 7.4,
+      "tethered": true,
+      "cableLengthM": 5
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-041.pdf",
+    "markets": [
+      "UK",
+      "DACH",
+      "IT"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-042",
+    "type": "accessory",
+    "manufacturer": "Mitsubishi Electric",
+    "model": "FTC6 Main Controller",
+    "manufacturerArticleNo": "PAC-IF072B-E",
+    "specs": {
+      "compatibleWith": "Ecodan monobloc"
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-042.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  },
+  {
+    "id": "cat-043",
+    "type": "accessory",
+    "manufacturer": "myenergi",
+    "model": "eddi Solar Diverter",
+    "manufacturerArticleNo": "EDDI-H1",
+    "specs": {
+      "maxPowerKw": 3.68
+    },
+    "datasheetUrl": "https://example.com/datasheets/cat-043.pdf",
+    "markets": [
+      "UK"
+    ],
+    "marketData": {},
+    "supplierAliases": [],
+    "lastVerified": "2026-09-14"
+  }
+]

@@ -1,0 +1,78 @@
+{
+  "invoiceNumber": "NRS-INV-25033",
+  "supplier": "Northbridge Renewables Supply Ltd",
+  "date": "09/10/2026",
+  "currency": "GBP",
+  "lines": [
+    {
+      "code": "NB-PV-30441",
+      "description": "AIKO NEOSTAR 2P 450W BLK FR",
+      "quantity": 24,
+      "unitPrice": 98.0,
+      "expected": {
+        "status": "catalog_match",
+        "catalogId": "cat-029",
+        "matchedBy": "supplier_code"
+      }
+    },
+    {
+      "code": "NB-IN-60122",
+      "description": "GIVENERGY GEN3 HYBRID 5KW",
+      "quantity": 2,
+      "unitPrice": 865.0,
+      "expected": {
+        "status": "duplicate_no_change",
+        "myComponentId": "my-002",
+        "catalogId": "cat-023"
+      }
+    },
+    {
+      "code": "NB-EV-11702",
+      "description": "OHME HOME PRO 7KW TETH 8M",
+      "quantity": 3,
+      "unitPrice": 585.0,
+      "expected": {
+        "status": "catalog_match",
+        "catalogId": "cat-038",
+        "matchedBy": "ai",
+        "note": "5m and 8m variants exist"
+      }
+    },
+    {
+      "code": "NB-BT-24105",
+      "description": "FOX ESS EP11 BATT 10.36KWH",
+      "quantity": 2,
+      "unitPrice": 2290.0,
+      "expected": {
+        "status": "catalog_match",
+        "catalogId": "cat-019",
+        "matchedBy": "ai"
+      }
+    },
+    {
+      "code": "NB-MT-40020",
+      "description": "K2 MINIRAIL 2.2M",
+      "quantity": 30,
+      "unitPrice": 14.2,
+      "expected": {
+        "status": "new",
+        "note": "Mounting accessory, not in catalog; keep as accessory"
+      }
+    },
+    {
+      "code": "",
+      "description": "CARRIAGE",
+      "quantity": 1,
+      "unitPrice": 25.0,
+      "expected": {
+        "status": "ignored",
+        "reason": "delivery"
+      }
+    }
+  ],
+  "totals": {
+    "net": 10868.0,
+    "vat": 2173.6,
+    "gross": 13041.6
+  }
+}

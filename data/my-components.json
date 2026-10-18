@@ -1,0 +1,117 @@
+[
+  {
+    "id": "my-001",
+    "name": "Ecodan 8.5kW Monobloc",
+    "type": "heat_pump",
+    "manufacturer": "Mitsubishi Electric",
+    "articleNo": "PUZ-WM85VAA",
+    "purchasePrice": 3180.0,
+    "salesPrice": 4450.0,
+    "catalogRef": "cat-002",
+    "specs": {
+      "heatingCapacityKw": 8.5,
+      "refrigerant": "R32"
+    },
+    "source": "manual",
+    "updatedAt": "2026-06-02"
+  },
+  {
+    "id": "my-002",
+    "name": "Gen3 Hybrid Inverter 5kW",
+    "type": "inverter",
+    "manufacturer": "GivEnergy",
+    "articleNo": "GIV-HY5.0",
+    "purchasePrice": 865.0,
+    "salesPrice": 1210.0,
+    "catalogRef": "cat-023",
+    "specs": {
+      "acPowerKw": 5.0
+    },
+    "source": "manual",
+    "updatedAt": "2026-06-02"
+  },
+  {
+    "id": "my-003",
+    "name": "DeepBlue 4.0 440W",
+    "type": "pv_module",
+    "manufacturer": "JA Solar",
+    "articleNo": "JAM54D40-440/LB",
+    "purchasePrice": 92.0,
+    "salesPrice": 135.0,
+    "catalogRef": "cat-030",
+    "specs": {
+      "powerWp": 440
+    },
+    "source": "manual",
+    "updatedAt": "2026-06-02"
+  },
+  {
+    "id": "my-004",
+    "name": "Home 3 Pro 7kW",
+    "type": "ev_charger",
+    "manufacturer": "Hypervolt",
+    "articleNo": "HV-H3P-7",
+    "purchasePrice": 640.0,
+    "salesPrice": 899.0,
+    "catalogRef": "cat-040",
+    "specs": {
+      "powerKw": 7.4
+    },
+    "source": "manual",
+    "updatedAt": "2026-06-02"
+  },
+  {
+    "id": "my-005",
+    "name": "Mixergy X 210L",
+    "type": "hot_water_cylinder",
+    "manufacturer": "Mixergy",
+    "articleNo": "MX-HP-210",
+    "purchasePrice": 1420.0,
+    "salesPrice": 1950.0,
+    "catalogRef": "cat-015",
+    "specs": {
+      "capacityLitres": 210
+    },
+    "source": "manual",
+    "updatedAt": "2026-06-02"
+  },
+  {
+    "id": "my-006",
+    "name": "Site survey & heat loss calculation",
+    "type": "service",
+    "manufacturer": null,
+    "articleNo": null,
+    "purchasePrice": 0,
+    "salesPrice": 250.0,
+    "catalogRef": null,
+    "specs": {},
+    "source": "manual",
+    "updatedAt": "2026-06-02"
+  },
+  {
+    "id": "my-007",
+    "name": "MCS certification & DNO notification",
+    "type": "service",
+    "manufacturer": null,
+    "articleNo": null,
+    "purchasePrice": 0,
+    "salesPrice": 180.0,
+    "catalogRef": null,
+    "specs": {},
+    "source": "manual",
+    "updatedAt": "2026-06-02"
+  },
+  {
+    "id": "my-008",
+    "name": "Scaffolding (per elevation)",
+    "type": "service",
+    "manufacturer": null,
+    "articleNo": null,
+    "purchasePrice": 320.0,
+    "salesPrice": 450.0,
+    "catalogRef": null,
+    "specs": {},
+    "source": "manual",
+    "updatedAt": "2026-06-02"
+  }
+]

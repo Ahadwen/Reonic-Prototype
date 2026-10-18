@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice to Components</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Invoice → Components</h1>
+        <p class="sub">Step 1 test bench: extract line items from a supplier invoice.</p>
+      </header>
+
+      <section class="card">
+        <label for="api-key">Anthropic API key</label>
+        <div class="row">
+          <input id="api-key" type="password" placeholder="sk-ant-…" autocomplete="off" />
+          <label class="check"><input id="remember-key" type="checkbox" /> Remember in this browser</label>
+        </div>
+        <p class="hint">Sent only to api.anthropic.com from your browser. Never committed or uploaded anywhere else.</p>
+      </section>
+
+      <section class="card">
+        <label>Invoice</label>
+        <div class="row">
+          <input id="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" />
+          <span class="or">or try a sample:</span>
+          <div id="samples" class="row"></div>
+        </div>
+        <button id="run" disabled>Extract</button>
+      </section>
+
+      <section id="status" class="status" hidden></section>
+      <section id="output"></section>
+    </main>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+{
+  "invoiceNumber": "NRS-INV-24817",
+  "supplier": "Northbridge Renewables Supply Ltd",
+  "date": "02/10/2026",
+  "currency": "GBP",
+  "lines": [
+    {
+      "code": "NB-HP-40312",
+      "description": "MITSU ECODAN 8.5KW MONO ASHP R32",
+      "quantity": 2,
+      "unitPrice": 3245.0,
+      "expected": {
+        "status": "duplicate_price_change",
+        "myComponentId": "my-001",
+        "catalogId": "cat-002",
+        "note": "Already in database at £3,180; price changed"
+      }
+    },
+    {
+      "code": "NB-BT-22018",
+      "description": "GIVENERGY AIO 13.5KWH BATTERY",
+      "quantity": 3,
+      "unitPrice": 4310.0,
+      "expected": {
+        "status": "catalog_match",
+        "catalogId": "cat-016",
+        "matchedBy": "supplier_code"
+      }
+    },
+    {
+      "code": "0010021118",
+      "description": "VAILLANT AROTHERM PLUS 7KW R290",
+      "quantity": 1,
+      "unitPrice": 4120.0,
+      "expected": {
+        "status": "catalog_match",
+        "catalogId": "cat-008",
+        "matchedBy": "manufacturer_article_no"
+      }
+    },
+    {
+      "code": "NB-CY-77104",
+      "description": "TELFORD TEMP HP CYL 250L UNV",
+      "quantity": 2,
+      "unitPrice": 1085.0,
+      "expected": {
+        "status": "catalog_match",
+        "catalogId": "cat-013",
+        "matchedBy": "ai",
+        "note": "Abbreviated; 210/250/300L variants exist"
+      }
+    },
+    {
+      "code": "NB-EV-11490",
+      "description": "ZAPPI 7KW UNTETH BLK",
+      "quantity": 4,
+      "unitPrice": 699.0,
+      "expected": {
+        "status": "catalog_match",
+        "catalogId": "cat-036",
+        "matchedBy": "ai",
+        "note": "Must pick untethered + black from three zappi variants"
+      }
+    },
+    {
+      "code": "NB-HP-40987",
+      "description": "DAIKIN ALTHERMA 3 MONO 8KW",
+      "quantity": 1,
+      "unitPrice": 3890.0,
+      "expected": {
+        "status": "needs_review",
+        "candidates": [
+          "cat-005",
+          "cat-006"
+        ],
+        "note": "Ambiguous: Altherma 3 R and 3 H HT both come in 8kW monobloc"
+      }
+    },
+    {
+      "code": "TS4-A-O",
+      "description": "TIGO TS4-A-O OPTIMISER 700W",
+      "quantity": 20,
+      "unitPrice": 38.5,
+      "expected": {
+        "status": "catalog_match",
+        "catalogId": "cat-033",
+        "matchedBy": "manufacturer_article_no"
+      }
+    },
+    {
+      "code": "NB-BT-23310",
+      "description": "SUNSYNK L5.1 5.12KWH BATTERY",
+      "quantity": 2,
+      "unitPrice": 1240.0,
+      "expected": {
+        "status": "new",
+        "note": "Not in catalog; create from invoice and flag missing specs"
+      }
+    },
+    {
+      "code": "NB-CB-00612",
+      "description": "6MM TWIN & EARTH CABLE 50M DRUM",
+      "quantity": 1,
+      "unitPrice": 96.4,
+      "expected": {
+        "status": "ignored",
+        "reason": "consumable"
+      }
+    },
+    {
+      "code": "NB-PV-09001",
+      "description": "MC4 CONNECTOR PAIR",
+      "quantity": 40,
+      "unitPrice": 1.85,
+      "expected": {
+        "status": "ignored",
+        "reason": "consumable"
+      }
+    },
+    {
+      "code": "",
+      "description": "DELIVERY - PALLET",
+      "quantity": 1,
+      "unitPrice": 45.0,
+      "expected": {
+        "status": "ignored",
+        "reason": "delivery"
+      }
+    }
+  ],
+  "totals": {
+    "net": 35861.4,
+    "vat": 7172.28,
+    "gross": 43033.68
+  }
+}

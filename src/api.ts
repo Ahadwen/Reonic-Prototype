@@ -1,6 +1,6 @@
 // Minimal Messages API client using fetch. Works in the browser and in Node 18+.
-// With an API key it calls Anthropic directly; without one it goes through the claude-proxy
-// Edge Function, which holds the demo's key so visitors don't need their own.
+// With an API key (Node scripts, from .env) it calls Anthropic directly. Without one (the browser)
+// it goes through the claude-proxy Edge Function, which holds the demo's key.
 
 import { CLAUDE_PROXY_URL, SUPABASE_ANON_KEY } from "./config.ts";
 

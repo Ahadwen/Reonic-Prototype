@@ -14,7 +14,7 @@ npm run dev          # http://localhost:5173
 npm test             # review-step tests, offline
 ```
 
-Go to **Import from invoice**, pick a sample (or drop your own PDF/photo), review the matches and confirm. The new components appear on the **Components** page. Changes are kept in your browser; **Reset demo data** in the sidebar starts over. Import the same invoice twice to see the learned supplier codes match everything instantly. No API key needed: without one, the page calls Claude through the `claude-proxy` Edge Function (see below). If you paste your own key, it goes straight from your browser to api.anthropic.com instead.
+Go to **Import from invoice**, pick a sample (or drop your own PDF/photo), review the matches and confirm. The new components appear on the **Components** page. No API key needed: the page calls Claude through the `claude-proxy` Edge Function (see below). Changes are kept in your browser; **Reset demo data** in the sidebar starts over. Import the same invoice twice to see the learned supplier codes match everything instantly. 
 
 To score extraction against the expected results:
 

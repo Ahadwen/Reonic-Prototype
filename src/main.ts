@@ -77,10 +77,6 @@ function specPills(specs: Record<string, unknown>, max = 4) {
     .map(([k, v]) => `<span class="pill">${esc(label(k))}: ${esc(Array.isArray(v) ? v.join(", ") : v)}</span>`).join("");
 }
 
-function apiKey(): string | null {
-  return (document.getElementById("api-key") as HTMLInputElement).value.trim() || null;
-}
-
 // ---------- Components view ----------
 
 async function renderComponents(s: Extract<State, { view: "components" }>) {
@@ -165,15 +161,15 @@ async function process(fileName: string, blob: Blob) {
   const started = performance.now();
   try {
     setState({ view: "processing", fileName, step: 0 });
-    const key = apiKey();
-    const extraction = await extractInvoice(key, await toInvoiceFile(blob));
+    // No API key in the browser: calls go through the claude-proxy Edge Function.
+    const extraction = await extractInvoice(null, await toInvoiceFile(blob));
 
     setState({ view: "processing", fileName, step: 1 });
     const [catalog, mine] = await Promise.all([store.getCatalog(), store.getMyComponents()]);
     const byRules = matchInvoice(extraction.invoice, catalog, mine);
 
     setState({ view: "processing", fileName, step: 2 });
-    const resolved = await resolveWithAI(key, byRules, catalog, mine);
+    const resolved = await resolveWithAI(null, byRules, catalog, mine);
 
     const markup = usualMarkup(mine);
     const usage: Usage[] = [extraction.usage, ...(resolved.usage ? [resolved.usage] : [])];
@@ -462,22 +458,6 @@ app.addEventListener("input", (e) => {
 });
 
 // ---------- Sidebar ----------
-
-const keyInput = document.getElementById("api-key") as HTMLInputElement;
-const rememberBox = document.getElementById("remember-key") as HTMLInputElement;
-const KEY_STORAGE = "invoice-demo-api-key";
-try {
-  const saved = localStorage.getItem(KEY_STORAGE);
-  if (saved) { keyInput.value = saved; rememberBox.checked = true; }
-} catch { /* storage unavailable */ }
-function persistKey() {
-  try {
-    if (rememberBox.checked && keyInput.value) localStorage.setItem(KEY_STORAGE, keyInput.value);
-    else localStorage.removeItem(KEY_STORAGE);
-  } catch { /* ignore */ }
-}
-keyInput.addEventListener("input", persistKey);
-rememberBox.addEventListener("change", persistKey);
 
 document.getElementById("reset")!.addEventListener("click", async () => {
   await store.reset();

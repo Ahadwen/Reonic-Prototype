@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
   delete body.stream;
 
   if (!(await rpc("reonic_take_api_call", { p_daily_limit: DAILY_CALL_LIMIT }))) {
-    return error(429, "The demo has reached today's usage limit. Paste your own API key to keep going.", headers);
+    return error(429, "The demo has reached today's usage limit. Please try again tomorrow.", headers);
   }
 
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {

@@ -46,8 +46,6 @@ nav a.active { background: var(--accent-soft); color: var(--accent); font-weight
 .count { color: var(--muted); font-size: 12px; margin-left: auto; }
 .new-badge { margin-left: auto; font-size: 11px; background: var(--accent); color: var(--accent-text); padding: 1px 6px; border-radius: 999px; }
 .sidebar-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; font-size: 13px; padding: 0 6px; }
-.sidebar-foot summary { cursor: pointer; color: var(--muted); }
-.sidebar-foot input[type="password"] { width: 100%; margin: 8px 0 6px; }
 button.link { background: none; border: 0; padding: 0; color: var(--muted); cursor: pointer; text-align: left; text-decoration: underline; }
 
 main { padding: 24px 32px 120px; min-width: 0; }

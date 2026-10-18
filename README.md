@@ -1,4 +1,11 @@
-# Invoice → Components prototype
+# Reonic PM case study prototype
+
+One site for both parts of the case study. The home page (`#`) links to:
+
+- **Part 1 · Product thinking** (`#components`, `#import`): invoice → components, described below.
+- **Part 2 · Product taste** (`#offer`): Screen C, the digital offer, recreated from the brief as the starting point for the critique and redesign.
+
+## Part 1: Invoice → Components
 
 Upload a supplier invoice (PDF or photo). The app extracts the line items, matches each one against the installer's existing components and a central catalog, then shows a pre-filled list to review and confirm.
 
@@ -71,7 +78,9 @@ Never commit an API key. The site asks for one at runtime instead.
 | `src/store.ts` | Data access behind a `Store` interface. Today: the JSON seed data plus localStorage. Later: Supabase. |
 | `src/types.ts` | Shared types |
 | `src/cost.ts` | Token → USD estimate |
-| `src/main.ts`, `index.html`, `src/style.css` | The app: components list, and the upload → processing → review → confirm flow |
+| `src/main.ts` | Router and case-study home page |
+| `src/part1.ts`, `index.html`, `src/style.css` | Part 1 UI: components list, and the upload → processing → review → confirm flow |
+| `src/part2.ts`, `src/part2.css` | Part 2: Screen C (the digital offer) recreated from the brief |
 | `scripts/eval-extraction.ts` | Extraction accuracy against `public/samples/*.expected.json` |
 | `scripts/eval-matching.ts` | Matching accuracy against the same files |
 | `scripts/test-review.ts` | Tests for the review step (`npm test`), with the AI step simulated from the expected results |

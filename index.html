@@ -3,14 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice to Components</title>
+    <title>Reonic Case Study</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
-    <div class="shell">
+    <div id="home" hidden></div>
+    <div id="part2" hidden></div>
+    <div class="shell" id="part1" hidden>
       <aside class="sidebar">
         <div class="workspace">
           <div class="avatar">BH</div>
@@ -25,6 +27,7 @@
           <a href="#import" data-nav="import">Import from invoice <span class="new-badge">New</span></a>
         </nav>
         <div class="sidebar-foot">
+          <a href="#" class="link">← Case study home</a>
           <button id="reset" class="link">Reset demo data</button>
         </div>
       </aside>

@@ -1,0 +1,51 @@
+/* Screen C recreation. Deliberately self-contained and light-only, like the original. */
+
+#part2 { background: #fff; color: #111; min-height: 100vh; font-family: Inter, system-ui, sans-serif; }
+
+.case-bar { background: #18181b; color: #d4d4d8; font-size: 13px; padding: 8px 16px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.case-bar a { color: #fff; text-decoration: none; font-weight: 500; }
+
+.offer-head { display: flex; align-items: center; gap: 14px; padding: 14px 40px; border-bottom: 1px solid #ececec; }
+.offer-logo svg { width: 64px; height: 40px; display: block; }
+.offer-title { font-weight: 700; font-size: 16px; }
+.offer-from { font-size: 14px; }
+
+.offer-body { display: grid; grid-template-columns: 300px 1fr; }
+.offer-nav { position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; padding: 28px 20px 28px 26px; display: flex; flex-direction: column; gap: 4px; }
+.offer-nav button { background: none; border: 0; text-align: left; font: inherit; font-size: 14px; color: #111; padding: 6px 0 6px 2px; cursor: pointer; line-height: 1.45; }
+.offer-nav button.active { color: #f07d00; }
+.offer-nav button.active::before { content: "• "; }
+
+.offer-main { min-width: 0; }
+.offer-glance { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 1fr); gap: 32px; padding: 20px 20px 28px 16px; align-items: start; }
+.offer-text h1 { font-size: 38px; font-weight: 700; margin: 0 0 22px; letter-spacing: -0.01em; }
+.offer-text p { font-size: 16px; line-height: 1.55; margin: 0 0 26px; }
+.offer-text h3 { color: #f07d00; font-size: 30px; font-weight: 500; margin: 0 0 14px; }
+.offer-checks { list-style: none; padding: 0; margin: 0 0 18px; }
+.offer-checks li { display: flex; gap: 14px; align-items: center; font-size: 17px; line-height: 1.6; margin-bottom: 22px; }
+.offer-checks svg { width: 34px; height: 34px; flex: none; }
+.offer-total { display: flex; justify-content: space-between; background: #f5f5f6; border-top: 2px solid #e2e2e4; padding: 12px 16px; font-weight: 600; font-size: 16px; }
+.offer-art { padding-top: 60px; }
+.offer-house { width: 100%; max-width: 720px; height: auto; display: block; font-family: Inter, system-ui, sans-serif; }
+
+.offer-pdf { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #f2f3f5; padding: 22px 300px 22px 16px; }
+.offer-pdf b { display: block; font-size: 16px; }
+.offer-pdf small { font-size: 12px; }
+.offer-pdf-btn { display: inline-flex; gap: 6px; align-items: center; background: #fff; border: 1.5px solid #1f3d4f; color: #1f3d4f; border-radius: 6px; padding: 6px 10px; font: inherit; font-size: 15px; cursor: pointer; white-space: nowrap; }
+.offer-pdf-btn svg { width: 15px; height: 15px; }
+
+.offer-section { padding: 110px 16px 40px; min-height: 60vh; }
+.offer-section h2 { font-size: 38px; font-weight: 700; margin: 0 0 12px; }
+.offer-stub { color: #9a9a9a; font-size: 14px; }
+
+@media (max-width: 1200px) {
+  .offer-glance { grid-template-columns: 1fr; }
+  .offer-art { padding-top: 0; }
+  .offer-pdf { padding-right: 16px; }
+}
+@media (max-width: 760px) {
+  .offer-head { padding: 12px 16px; }
+  .offer-body { grid-template-columns: 1fr; }
+  .offer-nav { display: none; }
+  .offer-text h1 { font-size: 30px; }
+}

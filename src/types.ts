@@ -118,4 +118,12 @@ export interface LineMatch {
   previousPrice?: number;     // set for duplicate_price_change
   candidates: Candidate[];    // shortlist for the AI step or for manual review
   reason: string;             // one line, shown in the review UI
+  suggestion?: NewComponentSuggestion; // for "new" lines: the AI's reading of what the product is
+}
+
+export interface NewComponentSuggestion {
+  type: ComponentType;
+  manufacturer: string;
+  model: string;
+  specs: { name: string; value: string }[];
 }

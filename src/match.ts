@@ -101,7 +101,7 @@ export function shortlist(line: InvoiceLine, catalog: CatalogItem[]): Candidate[
 }
 
 // Without a catalog item, `mine` holds the one component already identified.
-function withDuplicateCheck(m: LineMatch, item: CatalogItem | undefined, mine: MyComponent[]): LineMatch {
+export function withDuplicateCheck(m: LineMatch, item: CatalogItem | undefined, mine: MyComponent[]): LineMatch {
   const existing = item
     ? mine.find((c) => c.catalogRef === item.id || (normCode(c.articleNo) !== "" && normCode(c.articleNo) === normCode(item.manufacturerArticleNo)))
     : mine[0];

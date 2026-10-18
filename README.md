@@ -31,6 +31,7 @@ To score matching (no API calls, free):
 ```bash
 npm run eval:match                 # uses the lines from .expected.json
 npm run eval:match -- --extracted  # uses what the model actually read in the latest `npm run eval`
+npm run eval:match -- --ai         # also runs the AI step (calls the API); add --runs 3 to check consistency
 ```
 
 ## Supabase
@@ -64,6 +65,7 @@ Never commit an API key. The site asks for one at runtime instead.
 | `src/config.ts` | Public Supabase settings (project URL, anon key, proxy URL) |
 | `src/extract.ts` | Pipeline step 1: invoice → structured line items, using a JSON schema so the response shape is guaranteed. Also checks the model's arithmetic. |
 | `src/match.ts` | Pipeline step 2: rule-based matching. Supplier code → manufacturer article no. → your own article no.; then duplicate and price-change check. Anything left gets a shortlist of candidates for the AI step or a person. |
+| `src/resolve.ts` | Pipeline step 3: one AI call per invoice picks from each shortlist (or says it's unclear, so a person decides), and reads lines with no catalog match into a type, manufacturer, model and specs for the new record. It can only pick shortlisted items, so it can't invent a match. |
 | `src/store.ts` | Data access behind a `Store` interface. Today: the JSON seed data plus localStorage. Later: Supabase. |
 | `src/types.ts` | Shared types |
 | `src/cost.ts` | Token → USD estimate |

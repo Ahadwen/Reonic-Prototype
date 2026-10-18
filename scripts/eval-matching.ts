@@ -3,12 +3,19 @@
 //   npm run eval:match                      # lines taken from .expected.json (code + description only)
 //   npm run eval:match -- --extracted       # lines from the newest eval-results/extraction-*.json,
 //                                           # i.e. what the model really read, guesses included
+//   npm run eval:match -- --ai              # also run the AI step (calls the API; key from .env,
+//                                           # or the demo proxy without one)
+//   npm run eval:match -- --ai --runs 3 --model claude-haiku-5-5
 //
-// Lines the AI step is meant to resolve are scored on whether the right item made the shortlist.
+// Without --ai, lines the AI step is meant to resolve are scored on whether the right item made the
+// shortlist. With --ai they must end up matched to the right item.
 
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { matchInvoice } from "../src/match.ts";
+import { resolveWithAI } from "../src/resolve.ts";
+import { costUsd } from "../src/cost.ts";
+import { DEFAULT_MODEL } from "../src/api.ts";
 import { JsonStore } from "../src/store.ts";
 import type { ExtractedInvoice, InvoiceLine, LineMatch } from "../src/types.ts";
 
@@ -22,7 +29,16 @@ interface ExpectedLine {
 interface Expected { invoiceNumber: string; supplier: string; currency: string; lines: ExpectedLine[] }
 
 const DIR = "public/samples";
-const useExtracted = process.argv.includes("--extracted");
+const args = process.argv.slice(2);
+const flag = (name: string) => args.includes(name);
+const option = (name: string) => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined);
+const useExtracted = flag("--extracted");
+const useAI = flag("--ai");
+const runs = useAI ? Number(option("--runs") ?? 1) : 1;
+const model = option("--model") ?? DEFAULT_MODEL;
+
+if (existsSync(".env")) process.loadEnvFile(".env");
+const apiKey = process.env.ANTHROPIC_API_KEY || null;
 
 const store = new JsonStore();
 const catalog = await store.getCatalog();
@@ -59,6 +75,10 @@ function judge(exp: ExpectedLine["expected"], m: LineMatch | undefined): { verdi
   const got = `${m.status}${m.catalogId ? ` ${m.catalogId}` : ""}${m.matchedBy ? ` by ${m.matchedBy}` : ""}`;
   const ids = m.candidates.map((c) => c.catalogId);
 
+  if (exp.matchedBy === "ai" && useAI) {
+    const ok = m.status === "catalog_match" && m.catalogId === exp.catalogId && m.matchedBy === "ai";
+    return { verdict: ok ? "ok" : "wrong", detail: ok ? `${got}: ${m.reason}` : `got ${got}: ${m.reason}` };
+  }
   if (exp.matchedBy === "ai") {
     // Rules shouldn't guess here; the right answer just has to reach the AI step.
     if (m.status === "needs_review" && exp.catalogId && ids.includes(exp.catalogId)) {
@@ -69,19 +89,25 @@ function judge(exp: ExpectedLine["expected"], m: LineMatch | undefined): { verdi
   if (exp.status === "needs_review") {
     const all = (exp.candidates ?? []).every((c) => ids.includes(c));
     return m.status === "needs_review" && all
-      ? { verdict: "ok", detail: `candidates [${ids.join(", ")}]` }
+      ? { verdict: "ok", detail: `candidates [${ids.join(", ")}]${useAI ? `: ${m.reason}` : ""}` }
       : { verdict: "wrong", detail: `got ${got}, shortlist [${ids.join(", ")}]` };
   }
   const ok = m.status === exp.status
     && (!exp.catalogId || m.catalogId === exp.catalogId)
     && (!exp.myComponentId || m.myComponentId === exp.myComponentId);
-  return { verdict: ok ? "ok" : "wrong", detail: ok ? got : `got ${got}` };
+  const s = m.suggestion;
+  const suggestion = s ? ` → ${s.type}: ${[s.manufacturer, s.model].filter(Boolean).join(" ")}${s.specs.length ? ` (${s.specs.map((x) => `${x.name} ${x.value}`).join(", ")})` : ""}` : "";
+  return { verdict: ok ? "ok" : "wrong", detail: (ok ? got : `got ${got}`) + suggestion };
 }
 
 const extracted = useExtracted ? latestExtractions() : null;
 const tally: Record<Verdict, number> = { ok: 0, shortlisted: 0, wrong: 0 };
 let aiLines = 0;
+let aiCost = 0;
+let aiMs = 0;
 
+for (let run = 1; run <= runs; run++) {
+if (runs > 1) console.log(`=== run ${run} of ${runs} ===\n`);
 for (const f of readdirSync(DIR).filter((f) => f.endsWith(".expected.json")).sort()) {
   const exp: Expected = JSON.parse(readFileSync(join(DIR, f), "utf8"));
   const invoice: ExtractedInvoice = extracted?.get(exp.invoiceNumber) ?? {
@@ -90,8 +116,17 @@ for (const f of readdirSync(DIR).filter((f) => f.endsWith(".expected.json")).sor
   };
   if (extracted && !extracted.has(exp.invoiceNumber)) console.log(`(no extraction for ${exp.invoiceNumber}, using expected lines)`);
 
-  const matches = matchInvoice(invoice, catalog, mine);
-  console.log(exp.invoiceNumber);
+  let matches = matchInvoice(invoice, catalog, mine);
+  let aiNote = "";
+  if (useAI) {
+    const r = await resolveWithAI(apiKey, matches, catalog, mine, model);
+    matches = r.matches;
+    const cost = r.usage ? costUsd(model, r.usage) ?? 0 : 0;
+    aiCost += cost;
+    aiMs += r.durationMs;
+    aiNote = r.usage ? `  (AI: ${(r.durationMs / 1000).toFixed(1)}s, ${r.usage.input_tokens} in / ${r.usage.output_tokens} out, $${cost.toFixed(3)})` : "";
+  }
+  console.log(exp.invoiceNumber + aiNote);
   for (const l of exp.lines) {
     const m = matches.find((x) => (l.code ? norm(x.line.code) === norm(l.code) : norm(x.line.description).includes(norm(l.description))));
     const { verdict, detail } = judge(l.expected, m);
@@ -102,10 +137,11 @@ for (const f of readdirSync(DIR).filter((f) => f.endsWith(".expected.json")).sor
   }
   console.log();
 }
+}
 
 const total = tally.ok + tally.shortlisted + tally.wrong;
-console.log(
-  `${tally.ok}/${total - aiLines} rule lines correct · ${tally.shortlisted}/${aiLines} AI lines shortlisted · ${tally.wrong} wrong`,
-);
+console.log(useAI
+  ? `${tally.ok}/${total} lines correct · ${tally.wrong} wrong · AI ${model} ${(aiMs / 1000).toFixed(1)}s, ≈ $${aiCost.toFixed(3)} total`
+  : `${tally.ok}/${total - aiLines} rule lines correct · ${tally.shortlisted}/${aiLines} AI lines shortlisted · ${tally.wrong} wrong`);
 console.log("✓ correct   → right answer in shortlist, left for the AI step   ✗ wrong");
 process.exitCode = tally.wrong ? 1 : 0;

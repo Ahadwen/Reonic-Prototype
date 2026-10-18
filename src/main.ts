@@ -1,9 +1,14 @@
-// Step 1 test bench: pick an invoice, extract it, show the lines.
+// Test bench: pick an invoice, extract it, match the lines, show the outcome per line.
 // This page is temporary scaffolding; the real upload -> review -> confirm UI comes later.
 
 import { extractInvoice, checkTotals } from "./extract.ts";
 import { costUsd } from "./cost.ts";
-import type { InvoiceFile, ExtractionResult } from "./types.ts";
+import { matchInvoice } from "./match.ts";
+import { resolveWithAI, type ResolveResult } from "./resolve.ts";
+import { JsonStore } from "./store.ts";
+import type { CatalogItem, InvoiceFile, ExtractionResult, LineMatch, MatchStatus } from "./types.ts";
+
+const store = new JsonStore();
 
 const SAMPLES = [
   { label: "Invoice 1 (PDF)", path: "samples/invoice-NRS-24817.pdf" },
@@ -84,10 +89,14 @@ runBtn.addEventListener("click", async () => {
   outputEl.innerHTML = "";
   showStatus(`Reading ${selected.name}…`);
   try {
+    const apiKey = keyInput.value.trim() || null;
     const file = await toInvoiceFile(selected.blob);
-    const result = await extractInvoice(keyInput.value.trim() || null, file);
+    const result = await extractInvoice(apiKey, file);
+    showStatus(`Read ${result.invoice.lines.length} lines. Matching…`);
+    const [catalog, mine] = await Promise.all([store.getCatalog(), store.getMyComponents()]);
+    const resolved = await resolveWithAI(apiKey, matchInvoice(result.invoice, catalog, mine), catalog, mine);
     statusEl.hidden = true;
-    render(result);
+    render(result, resolved, catalog);
   } catch (err) {
     showStatus(String(err instanceof Error ? err.message : err), true);
   } finally {
@@ -107,9 +116,41 @@ const money = (n: number, cur: string) => {
   catch { return n.toFixed(2); }
 };
 
-function render(r: ExtractionResult) {
+const STATUS_LABEL: Record<MatchStatus, string> = {
+  catalog_match: "Catalog match",
+  duplicate_no_change: "Already have",
+  duplicate_price_change: "Price changed",
+  needs_review: "Needs review",
+  new: "New",
+  ignored: "Ignored",
+};
+
+function outcome(m: LineMatch, catalog: CatalogItem[], currency: string): string {
+  const name = (id: string) => {
+    const c = catalog.find((x) => x.id === id);
+    return c ? `${c.manufacturer} ${c.model}` : id;
+  };
+  let detail = "";
+  if (m.catalogId && m.status !== "needs_review") detail = name(m.catalogId);
+  if (m.status === "duplicate_price_change" && m.previousPrice !== undefined) {
+    detail += ` · ${money(m.previousPrice, currency)} → ${money(m.line.unitPrice, currency)}`;
+  }
+  if (m.status === "needs_review") detail = m.candidates.map((c) => name(c.catalogId)).join(" or ");
+  if (m.suggestion) {
+    const s = m.suggestion;
+    detail = [s.manufacturer, s.model].filter(Boolean).join(" ") + ` (${s.type.replace(/_/g, " ")})`;
+  }
+  const by = m.matchedBy ? ` <span class="by">${m.matchedBy === "ai" ? "AI" : m.matchedBy.replace(/_/g, " ")}</span>` : "";
+  return `<span class="chip ${m.status}">${STATUS_LABEL[m.status]}</span>${by}
+    ${detail ? `<div class="detail">${esc(detail)}</div>` : ""}
+    <div class="guess">${esc(m.reason)}</div>`;
+}
+
+function render(r: ExtractionResult, resolved: ResolveResult, catalog: CatalogItem[]) {
   const inv = r.invoice;
-  const cost = costUsd(r.model, r.usage);
+  const matchCost = resolved.usage ? costUsd(r.model, resolved.usage) ?? 0 : 0;
+  const cost = (costUsd(r.model, r.usage) ?? 0) + matchCost;
+  const seconds = (r.durationMs + resolved.durationMs) / 1000;
   const warnings = checkTotals(inv);
   if (inv.readabilityIssues) warnings.unshift(`Model notes: ${inv.readabilityIssues}`);
 
@@ -120,22 +161,21 @@ function render(r: ExtractionResult) {
       <span>${esc(inv.invoiceDate)}</span>
       <span><b>${inv.lines.length}</b> lines</span>
       <span>Net <b>${money(inv.netTotal, inv.currency)}</b></span>
-      <span>${(r.durationMs / 1000).toFixed(1)} s</span>
-      <span>${r.usage.input_tokens.toLocaleString()} in / ${r.usage.output_tokens.toLocaleString()} out tokens${cost !== null ? ` ≈ $${cost.toFixed(3)}` : ""}</span>
+      <span>${seconds.toFixed(1)} s</span>
+      <span>≈ $${cost.toFixed(3)}</span>
     </div>
     ${warnings.map((w) => `<div class="warn">${esc(w)}</div>`).join("")}
     <div class="table-wrap"><table>
-      <thead><tr><th>Code</th><th>Description</th><th>Kind</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Total</th></tr></thead>
+      <thead><tr><th>Code</th><th>Description</th><th>Outcome</th><th class="num">Qty</th><th class="num">Unit</th></tr></thead>
       <tbody>
-        ${inv.lines.map((l) => `
+        ${resolved.matches.map(({ line: l }, i) => `
           <tr>
             <td>${esc(l.code) || "—"}</td>
             <td>${esc(l.description)}
               ${l.manufacturerGuess || l.modelGuess ? `<div class="guess">${esc([l.manufacturerGuess, l.modelGuess].filter(Boolean).join(" · "))}</div>` : ""}</td>
-            <td><span class="kind ${l.kind}">${l.kind}</span></td>
+            <td class="outcome">${outcome(resolved.matches[i], catalog, inv.currency)}</td>
             <td class="num">${l.quantity}</td>
             <td class="num">${money(l.unitPrice, inv.currency)}</td>
-            <td class="num">${money(l.lineTotal, inv.currency)}</td>
           </tr>`).join("")}
       </tbody>
     </table></div>

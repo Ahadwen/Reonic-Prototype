@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "eval": "tsx scripts/eval-extraction.ts"
+    "eval": "tsx scripts/eval-extraction.ts",
+    "eval:match": "tsx scripts/eval-matching.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

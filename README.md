@@ -26,6 +26,13 @@ npm run eval -- --runs 3     # repeat each to check consistency
 
 Each run prints field accuracy, tokens, time and cost per file, and saves full results to `eval-results/` (git-ignored).
 
+To score matching (no API calls, free):
+
+```bash
+npm run eval:match                 # uses the lines from .expected.json
+npm run eval:match -- --extracted  # uses what the model actually read in the latest `npm run eval`
+```
+
 ## Deploying to GitHub Pages
 
 Push to `main`, then in the repo go to **Settings → Pages → Source: GitHub Actions**. The workflow in `.github/workflows/deploy.yml` builds and publishes the site on every push.
@@ -38,10 +45,13 @@ Never commit an API key. The site asks for one at runtime instead.
 |---|---|
 | `src/api.ts` | Minimal `fetch` wrapper for the Messages API |
 | `src/extract.ts` | Pipeline step 1: invoice → structured line items, using a JSON schema so the response shape is guaranteed. Also checks the model's arithmetic. |
+| `src/match.ts` | Pipeline step 2: rule-based matching. Supplier code → manufacturer article no. → your own article no.; then duplicate and price-change check. Anything left gets a shortlist of candidates for the AI step or a person. |
+| `src/store.ts` | Data access behind a `Store` interface. Today: the JSON seed data plus localStorage. Later: Supabase. |
 | `src/types.ts` | Shared types |
 | `src/cost.ts` | Token → USD estimate |
 | `src/main.ts`, `index.html`, `src/style.css` | Temporary test bench page |
-| `scripts/eval-extraction.ts` | Accuracy scoring against `public/samples/*.expected.json` |
+| `scripts/eval-extraction.ts` | Extraction accuracy against `public/samples/*.expected.json` |
+| `scripts/eval-matching.ts` | Matching accuracy against the same files |
 
 ## Data
 

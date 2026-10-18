@@ -46,3 +46,76 @@ export interface InvoiceFile {
   base64: string;
   mediaType: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
 }
+
+// ---- Component data ----
+
+export type ComponentType =
+  | "heat_pump" | "hot_water_cylinder" | "battery" | "inverter" | "pv_module"
+  | "optimiser" | "ev_charger" | "accessory" | "service";
+
+// Markets are listed now so per-market fields have a home; the demo only fills UK.
+export type Market = "UK" | "DACH" | "IT" | "LATAM";
+
+export interface SupplierAlias {
+  supplier: string;
+  code: string;
+  description: string;
+}
+
+// A record in Reonic's central catalog.
+export interface CatalogItem {
+  id: string;
+  type: ComponentType;
+  manufacturer: string;
+  model: string;
+  manufacturerArticleNo: string;
+  specs: Record<string, string | number | boolean | string[]>;
+  datasheetUrl: string;
+  markets: Market[];
+  marketData: Partial<Record<Market, Record<string, string>>>;
+  supplierAliases: SupplierAlias[];
+  lastVerified: string;
+}
+
+// A record in one installer's own component database.
+export interface MyComponent {
+  id: string;
+  name: string;
+  type: ComponentType;
+  manufacturer: string | null;
+  articleNo: string | null;
+  purchasePrice: number;
+  salesPrice: number;
+  catalogRef: string | null;
+  specs: Record<string, string | number | boolean | string[]>;
+  source: "manual" | "catalog" | "invoice";
+  updatedAt: string;
+}
+
+// ---- Matching ----
+
+export type MatchStatus =
+  | "ignored"                 // consumable or delivery: no record needed
+  | "catalog_match"           // found in the central catalog, not yet in the installer's database
+  | "duplicate_no_change"     // already in the installer's database at this price
+  | "duplicate_price_change"  // already in the installer's database, price differs
+  | "needs_review"            // several plausible candidates, a person has to choose
+  | "new";                    // not in the catalog: create from the invoice line
+
+export type MatchedBy = "supplier_code" | "manufacturer_article_no" | "my_article_no" | "ai";
+
+export interface Candidate {
+  catalogId: string;
+  score: number;              // 0..1, how well the text overlaps; only used for ordering
+}
+
+export interface LineMatch {
+  line: InvoiceLine;
+  status: MatchStatus;
+  matchedBy?: MatchedBy;
+  catalogId?: string;
+  myComponentId?: string;
+  previousPrice?: number;     // set for duplicate_price_change
+  candidates: Candidate[];    // shortlist for the AI step or for manual review
+  reason: string;             // one line, shown in the review UI
+}

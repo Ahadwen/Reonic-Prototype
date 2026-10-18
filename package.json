@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "eval": "tsx scripts/eval-extraction.ts",
     "eval:match": "tsx scripts/eval-matching.ts",
-    "supabase": "tsx scripts/supabase.ts"
+    "supabase": "tsx scripts/supabase.ts",
+    "test": "tsx --test scripts/test-*.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

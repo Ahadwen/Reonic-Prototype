@@ -19,7 +19,10 @@ is what separates the candidates. If two or more candidates still fit, answer "u
 A wrong match costs the installer more than asking, so prefer "unclear" when in doubt.
 
 For each line without candidates, say what the product most likely is, from the description alone.
-Leave manufacturer or model empty rather than guessing. Only list specs the description states.`;
+"model" is the name an installer would list it under, without the manufacturer but with its size or
+capacity, in normal capitalisation (e.g. "L5.1 5.12kWh Battery", "MiniRail 2.2m").
+Leave manufacturer or model empty rather than guessing. Only list specs the description states,
+with camelCase names and units in the name (e.g. capacityKwh, lengthM).`;
 
 const COMPONENT_TYPES: ComponentType[] = [
   "heat_pump", "hot_water_cylinder", "battery", "inverter", "pv_module", "optimiser", "ev_charger", "accessory", "service",

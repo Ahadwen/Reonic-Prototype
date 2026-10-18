@@ -10,10 +10,11 @@ Needs Node 22 (or 20.12+).
 
 ```bash
 npm install
-npm run dev          # opens the test bench at http://localhost:5173
+npm run dev          # http://localhost:5173
+npm test             # review-step tests, offline
 ```
 
-Pick a sample invoice and press **Extract**. No API key needed: without one, the page calls Claude through the `claude-proxy` Edge Function (see below). If you paste your own key, it goes straight from your browser to api.anthropic.com instead.
+Go to **Import from invoice**, pick a sample (or drop your own PDF/photo), review the matches and confirm. The new components appear on the **Components** page. Changes are kept in your browser; **Reset demo data** in the sidebar starts over. Import the same invoice twice to see the learned supplier codes match everything instantly. No API key needed: without one, the page calls Claude through the `claude-proxy` Edge Function (see below). If you paste your own key, it goes straight from your browser to api.anthropic.com instead.
 
 To score extraction against the expected results:
 
@@ -66,12 +67,14 @@ Never commit an API key. The site asks for one at runtime instead.
 | `src/extract.ts` | Pipeline step 1: invoice → structured line items, using a JSON schema so the response shape is guaranteed. Also checks the model's arithmetic. |
 | `src/match.ts` | Pipeline step 2: rule-based matching. Supplier code → manufacturer article no. → your own article no.; then duplicate and price-change check. Anything left gets a shortlist of candidates for the AI step or a person. |
 | `src/resolve.ts` | Pipeline step 3: one AI call per invoice picks from each shortlist (or says it's unclear, so a person decides), and reads lines with no catalog match into a type, manufacturer, model and specs for the new record. It can only pick shortlisted items, so it can't invent a match. |
+| `src/review.ts` | Pipeline step 4: the installer's decisions per line, and the changes they produce (new records, price updates, supplier codes to remember). Sales prices are suggested at the installer's usual markup, learned from their existing products. |
 | `src/store.ts` | Data access behind a `Store` interface. Today: the JSON seed data plus localStorage. Later: Supabase. |
 | `src/types.ts` | Shared types |
 | `src/cost.ts` | Token → USD estimate |
-| `src/main.ts`, `index.html`, `src/style.css` | Temporary test bench page |
+| `src/main.ts`, `index.html`, `src/style.css` | The app: components list, and the upload → processing → review → confirm flow |
 | `scripts/eval-extraction.ts` | Extraction accuracy against `public/samples/*.expected.json` |
 | `scripts/eval-matching.ts` | Matching accuracy against the same files |
+| `scripts/test-review.ts` | Tests for the review step (`npm test`), with the AI step simulated from the expected results |
 | `scripts/supabase.ts` | Migrations, Edge Function deploys and secrets via the Supabase Management API |
 
 ## Data

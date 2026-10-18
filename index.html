@@ -4,37 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Invoice to Components</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
-    <main>
-      <header>
-        <h1>Invoice → Components</h1>
-        <p class="sub">Test bench: read a supplier invoice and match each line to your components.</p>
-      </header>
-
-      <section class="card">
-        <label for="api-key">Anthropic API key <span class="optional">(optional)</span></label>
-        <div class="row">
-          <input id="api-key" type="password" placeholder="Leave empty to use the demo key" autocomplete="off" />
-          <label class="check"><input id="remember-key" type="checkbox" /> Remember in this browser</label>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="workspace">
+          <div class="avatar">BH</div>
+          <div>
+            <div class="ws-name">Brightwell Heat &amp; Solar</div>
+            <div class="ws-sub">Demo installer</div>
+          </div>
         </div>
-        <p class="hint">Not needed: the demo calls Claude through a server that holds its own key. If you paste one, it goes only to api.anthropic.com from your browser.</p>
-      </section>
-
-      <section class="card">
-        <label>Invoice</label>
-        <div class="row">
-          <input id="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" />
-          <span class="or">or try a sample:</span>
-          <div id="samples" class="row"></div>
+        <nav>
+          <div class="nav-group">Company</div>
+          <a href="#components" data-nav="components">Components <span id="nav-count" class="count"></span></a>
+          <a href="#import" data-nav="import">Import from invoice <span class="new-badge">New</span></a>
+        </nav>
+        <div class="sidebar-foot">
+          <details>
+            <summary>Use your own API key</summary>
+            <input id="api-key" type="password" placeholder="sk-ant-… (optional)" autocomplete="off" />
+            <label class="check"><input id="remember-key" type="checkbox" /> Remember in this browser</label>
+            <p class="hint">Not needed: the demo calls Claude through a server with its own key. A key pasted here goes only to api.anthropic.com.</p>
+          </details>
+          <button id="reset" class="link">Reset demo data</button>
         </div>
-        <button id="run" disabled>Extract</button>
-      </section>
-
-      <section id="status" class="status" hidden></section>
-      <section id="output"></section>
-    </main>
+      </aside>
+      <main id="app"></main>
+    </div>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

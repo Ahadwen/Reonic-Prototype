@@ -1,6 +1,6 @@
 // Part 2 of the case study: Screen C, the first page of the digital offer an end customer receives.
 // This is a faithful recreation of the screen as given in the brief, flaws included, so the critique
-// and the redesign can sit next to it.
+// and the redesign can sit next to it. Only the part of the page the brief shows is recreated.
 
 import "./part2.css";
 
@@ -23,8 +23,6 @@ function fitToWidth() {
   offer.style.zoom = scale < 1 ? String(scale) : "";
 }
 window.addEventListener("resize", fitToWidth);
-
-let activeTracker: () => void = () => {};
 
 const check = `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#1f3d4f"/>
   <path d="M9.5 16.5l4.2 4.2 8.8-9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -80,12 +78,6 @@ const house = `<svg class="offer-house" viewBox="0 0 650 430" role="img" aria-la
   ${pill(388, 22, "Solar system")}${pill(470, 222, "Heat pump")}${pill(458, 330, "Battery storage")}
 </svg>`;
 
-function section(title: string, i: number) {
-  return `<section class="offer-section" data-section="${i}">
-    <h2>${title === "Solar system" ? "Your solar system" : title}</h2>
-    <p class="offer-stub">Not recreated: the brief only shows the first page of the offer.</p></section>`;
-}
-
 export function showPart2() {
   root.innerHTML = `
     <div class="case-bar">
@@ -97,9 +89,9 @@ export function showPart2() {
         <div><div class="offer-title">Your personal offer</div><div class="offer-from">from Testaccount Hai</div></div>
       </header>
       <div class="offer-body">
-        <nav class="offer-nav">${NAV.map((n, i) => `<button data-to="${i}" class="${i === 0 ? "active" : ""}">${n}</button>`).join("")}</nav>
+        <nav class="offer-nav">${NAV.map((n, i) => `<button class="${i === 0 ? "active" : ""}">${n}</button>`).join("")}</nav>
         <div class="offer-main">
-          <section class="offer-glance" data-section="0">
+          <section class="offer-glance">
             <div class="offer-text">
               <h1>Your cost estimate</h1>
               <p>Sehr geehrte/r ,</p>
@@ -122,27 +114,10 @@ export function showPart2() {
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               View PDF</button>
           </div>
-          ${NAV.slice(1).map((n, i) => section(n, i + 1)).join("")}
+          <div class="offer-end"><span>End of the screen shown in the brief</span></div>
         </div>
       </div>
     </div>`;
 
   fitToWidth();
-
-  // Side nav scrolls to sections; the active item follows the scroll position.
-  root.querySelectorAll<HTMLButtonElement>(".offer-nav button").forEach((b) =>
-    b.addEventListener("click", () => root.querySelector(`[data-section="${b.dataset.to}"]`)?.scrollIntoView({ behavior: "smooth" })));
-  const items = [...root.querySelectorAll<HTMLButtonElement>(".offer-nav button")];
-  const sections = [...root.querySelectorAll<HTMLElement>("[data-section]")];
-  const markActive = () => {
-    if (root.hidden) return;
-    // The section at the top of the screen. A fixed line rather than a share of the screen height,
-    // because zoomed out on a phone the sections are shorter than a quarter of the screen.
-    const line = 16;
-    const current = sections.filter((s) => s.getBoundingClientRect().top <= line).at(-1) ?? sections[0];
-    items.forEach((b) => b.classList.toggle("active", b.dataset.to === current.dataset.section));
-  };
-  window.removeEventListener("scroll", activeTracker);
-  activeTracker = markActive;
-  window.addEventListener("scroll", activeTracker, { passive: true });
 }

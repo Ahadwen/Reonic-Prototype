@@ -36,9 +36,8 @@
 .offer-pdf-btn { display: inline-flex; gap: 6px; align-items: center; background: #fff; border: 1.5px solid #1f3d4f; color: #1f3d4f; border-radius: 6px; padding: 6px 10px; font: inherit; font-size: 15px; cursor: pointer; white-space: nowrap; }
 .offer-pdf-btn svg { width: 15px; height: 15px; }
 
-.offer-section { padding: 110px 16px 40px; min-height: 60vh; }
-.offer-section h2 { font-size: 38px; font-weight: 700; margin: 0 0 12px; }
-.offer-stub { color: #9a9a9a; font-size: 14px; }
+.offer-end { border-top: 2px dashed #c4c4c8; margin: 48px 16px 0; padding: 10px 0 48px; text-align: center; }
+.offer-end span { color: #9a9a9a; font-size: 13px; }
 
 /* Always laid out as on a 1440px desktop; part2.ts zooms it out to fit narrower screens. */
 .offer { min-width: 1440px; }

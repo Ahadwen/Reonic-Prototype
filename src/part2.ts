@@ -14,6 +14,18 @@ const NAV = [
 
 const root = document.getElementById("part2")!;
 
+// The screen is shown as it looks on a desktop, scaled down on smaller screens rather than reflowed.
+const DESIGN_WIDTH = 1440;
+function fitToWidth() {
+  const offer = root.querySelector<HTMLElement>(".offer");
+  if (!offer) return;
+  const scale = Math.min(1, root.clientWidth / DESIGN_WIDTH);
+  offer.style.zoom = scale < 1 ? String(scale) : "";
+}
+window.addEventListener("resize", fitToWidth);
+
+let activeTracker: () => void = () => {};
+
 const check = `<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#1f3d4f"/>
   <path d="M9.5 16.5l4.2 4.2 8.8-9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -115,16 +127,22 @@ export function showPart2() {
       </div>
     </div>`;
 
+  fitToWidth();
+
   // Side nav scrolls to sections; the active item follows the scroll position.
   root.querySelectorAll<HTMLButtonElement>(".offer-nav button").forEach((b) =>
     b.addEventListener("click", () => root.querySelector(`[data-section="${b.dataset.to}"]`)?.scrollIntoView({ behavior: "smooth" })));
   const items = [...root.querySelectorAll<HTMLButtonElement>(".offer-nav button")];
-  const observer = new IntersectionObserver((entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue;
-      const i = (e.target as HTMLElement).dataset.section;
-      items.forEach((b) => b.classList.toggle("active", b.dataset.to === i));
-    }
-  }, { rootMargin: "-20% 0px -70% 0px" });
-  root.querySelectorAll("[data-section]").forEach((s) => observer.observe(s));
+  const sections = [...root.querySelectorAll<HTMLElement>("[data-section]")];
+  const markActive = () => {
+    if (root.hidden) return;
+    // The section at the top of the screen. A fixed line rather than a share of the screen height,
+    // because zoomed out on a phone the sections are shorter than a quarter of the screen.
+    const line = 16;
+    const current = sections.filter((s) => s.getBoundingClientRect().top <= line).at(-1) ?? sections[0];
+    items.forEach((b) => b.classList.toggle("active", b.dataset.to === current.dataset.section));
+  };
+  window.removeEventListener("scroll", activeTracker);
+  activeTracker = markActive;
+  window.addEventListener("scroll", activeTracker, { passive: true });
 }

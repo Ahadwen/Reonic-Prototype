@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "eval": "tsx scripts/eval-extraction.ts",
-    "eval:match": "tsx scripts/eval-matching.ts"
+    "eval:match": "tsx scripts/eval-matching.ts",
+    "supabase": "tsx scripts/supabase.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

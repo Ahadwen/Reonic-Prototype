@@ -62,7 +62,7 @@ function fileBlock(file: InvoiceFile) {
 }
 
 export async function extractInvoice(
-  apiKey: string,
+  apiKey: string | null,  // null: use the demo proxy
   file: InvoiceFile,
   model: string = DEFAULT_MODEL,
 ): Promise<ExtractionResult> {

@@ -13,7 +13,7 @@ npm install
 npm run dev          # opens the test bench at http://localhost:5173
 ```
 
-Paste an API key into the page, pick a sample invoice, press **Extract**. The key stays in your browser and only goes to api.anthropic.com.
+Pick a sample invoice and press **Extract**. No API key needed: without one, the page calls Claude through the `claude-proxy` Edge Function (see below). If you paste your own key, it goes straight from your browser to api.anthropic.com instead.
 
 To score extraction against the expected results:
 
@@ -33,6 +33,23 @@ npm run eval:match                 # uses the lines from .expected.json
 npm run eval:match -- --extracted  # uses what the model actually read in the latest `npm run eval`
 ```
 
+## Supabase
+
+Project `vefbvrgnobfapzosivag` is shared with another app, so everything here is prefixed `reonic_`.
+
+- `supabase/migrations/*.sql`: schema changes, applied in name order and recorded in `reonic_schema_migrations`.
+- `supabase/functions/claude-proxy`: forwards Messages API calls with the demo's Anthropic key, held as a Supabase secret. Only accepts the demo's origins and allowed models, caps `max_tokens`, and stops after `DAILY_CALL_LIMIT` calls a day (default 300), counted in `reonic_api_usage`.
+
+```bash
+# .env needs SUPABASE_ACCESS_TOKEN=sbp_... (and ANTHROPIC_API_KEY for the secret)
+npm run supabase -- migrate
+npm run supabase -- secret ANTHROPIC_API_KEY
+npm run supabase -- deploy claude-proxy
+npm run supabase -- sql "select * from reonic_api_usage"
+```
+
+Behind a proxy that Node's `fetch` ignores, prefix these with `NODE_USE_ENV_PROXY=1`.
+
 ## Deploying to GitHub Pages
 
 Push to `main`, then in the repo go to **Settings → Pages → Source: GitHub Actions**. The workflow in `.github/workflows/deploy.yml` builds and publishes the site on every push.
@@ -43,7 +60,8 @@ Never commit an API key. The site asks for one at runtime instead.
 
 | File | Purpose |
 |---|---|
-| `src/api.ts` | Minimal `fetch` wrapper for the Messages API |
+| `src/api.ts` | Minimal `fetch` wrapper for the Messages API: direct with a key, through `claude-proxy` without |
+| `src/config.ts` | Public Supabase settings (project URL, anon key, proxy URL) |
 | `src/extract.ts` | Pipeline step 1: invoice → structured line items, using a JSON schema so the response shape is guaranteed. Also checks the model's arithmetic. |
 | `src/match.ts` | Pipeline step 2: rule-based matching. Supplier code → manufacturer article no. → your own article no.; then duplicate and price-change check. Anything left gets a shortlist of candidates for the AI step or a person. |
 | `src/store.ts` | Data access behind a `Store` interface. Today: the JSON seed data plus localStorage. Later: Supabase. |
@@ -52,6 +70,7 @@ Never commit an API key. The site asks for one at runtime instead.
 | `src/main.ts`, `index.html`, `src/style.css` | Temporary test bench page |
 | `scripts/eval-extraction.ts` | Extraction accuracy against `public/samples/*.expected.json` |
 | `scripts/eval-matching.ts` | Matching accuracy against the same files |
+| `scripts/supabase.ts` | Migrations, Edge Function deploys and secrets via the Supabase Management API |
 
 ## Data
 

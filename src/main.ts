@@ -61,7 +61,7 @@ fileInput.addEventListener("change", () => {
 });
 
 function updateRunButton() {
-  runBtn.disabled = !(keyInput.value.trim() && selected);
+  runBtn.disabled = !selected;
 }
 
 async function toInvoiceFile(blob: Blob): Promise<InvoiceFile> {
@@ -85,7 +85,7 @@ runBtn.addEventListener("click", async () => {
   showStatus(`Reading ${selected.name}…`);
   try {
     const file = await toInvoiceFile(selected.blob);
-    const result = await extractInvoice(keyInput.value.trim(), file);
+    const result = await extractInvoice(keyInput.value.trim() || null, file);
     statusEl.hidden = true;
     render(result);
   } catch (err) {

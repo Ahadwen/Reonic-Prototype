@@ -14,12 +14,12 @@
       </header>
 
       <section class="card">
-        <label for="api-key">Anthropic API key</label>
+        <label for="api-key">Anthropic API key <span class="optional">(optional)</span></label>
         <div class="row">
-          <input id="api-key" type="password" placeholder="sk-ant-…" autocomplete="off" />
+          <input id="api-key" type="password" placeholder="Leave empty to use the demo key" autocomplete="off" />
           <label class="check"><input id="remember-key" type="checkbox" /> Remember in this browser</label>
         </div>
-        <p class="hint">Sent only to api.anthropic.com from your browser. Never committed or uploaded anywhere else.</p>
+        <p class="hint">Not needed: the demo calls Claude through a server that holds its own key. If you paste one, it goes only to api.anthropic.com from your browser.</p>
       </section>
 
       <section class="card">

@@ -1,6 +1,7 @@
 // Screen C, updated. Three changes, plus localisation as a baseline fix:
 //   1. The side nav is grouped into expandable categories instead of a flat list of 22 items.
-//   2. The price comes with context: what each part costs, the grant, and what it saves.
+//   2. The price comes with context: what each part costs, the grant, and what it saves,
+//      followed by a clear next step (accept, or ask a question) and where that leads.
 //   3. The house illustration and the price are linked: pointing at a product highlights its cost.
 // Localisation: every string comes from COPY in the customer's language, with their name filled in.
 
@@ -8,7 +9,7 @@ import { check, house, linkIcon, logo, type Item } from "./art.ts";
 
 export type Lang = "en" | "de";
 
-interface NavGroup { title: string; items: string[]; open: boolean }
+interface NavGroup { title: string; items: string[]; open: boolean; target?: string }
 
 const CUSTOMER = { title: { en: "Mr", de: "Herr" }, surname: "Thompson" };
 const INSTALLER = "Testaccount Hai";
@@ -22,6 +23,7 @@ const COSTS: { item: Item | "project"; amount: number }[] = [
 ];
 const GRANT = 7_500;
 const SAVINGS_PER_YEAR = 2_100;
+const VALID_UNTIL = new Date(2026, 10, 20);
 
 const COPY = {
   en: {
@@ -61,6 +63,19 @@ const COPY = {
       ["5.1 t", "less CO₂ per year"],
     ],
     estimates: "Estimates based on your household's usage. See Costs and savings for the details.",
+    nextTitle: "Next steps",
+    steps: ["Review your offer", "Accept online", "Technical survey", "Installation"],
+    stepNotes: ["You are here", "Takes a minute", "We visit to confirm the details", "Usually 3–5 days on site"],
+    surveyNext: "We'll call within 2 working days",
+    accept: "Accept offer",
+    accepted: "Offer accepted",
+    acceptedNote: "Thank you. We'll call you within 2 working days to book your technical survey.",
+    undo: "Undo",
+    ask: "Ask a question",
+    askPlaceholder: "Your question for Testaccount Hai…",
+    send: "Send",
+    sent: "Sent. We'll reply by email, usually the same day.",
+    validity: (d: string) => `Valid until ${d}. You can cancel free of charge within 14 days of accepting.`,
     pdfLead: "You can also download your cost estimate as a PDF.",
     pdfSub: "Simply click the button.",
     pdfBtn: "View PDF",
@@ -70,7 +85,7 @@ const COPY = {
       { title: "Your system", open: true, items: ["Solar system", "Solar components", "Electricity yield", "Energy storage", "Heat pump", "All components"] },
       { title: "Your home", open: false, items: ["Building", "Your household", "Your heat balance"] },
       { title: "Costs and savings", open: false, items: ["Economic efficiency", "Future tariff overview"] },
-      { title: "Next steps", open: false, items: ["Accept offer"] },
+      { title: "Next steps", open: false, items: ["Accept offer"], target: "next" },
       { title: "Documents", open: false, items: ["Datasheets", "MCS heat pump performance estimate", "MCS sound check results", "MCS key information", "MCS PV performance estimate", "Heat loss survey and radiator changes", "MCS proposed heat pump", "MCS shading and sun path diagram"] },
     ] as NavGroup[],
     langName: "English",
@@ -112,6 +127,19 @@ const COPY = {
       ["5,1 t", "weniger CO₂ pro Jahr"],
     ],
     estimates: "Schätzwerte auf Basis Ihres Verbrauchs. Details unter Kosten und Ersparnis.",
+    nextTitle: "Nächste Schritte",
+    steps: ["Angebot prüfen", "Online annehmen", "Technische Begehung", "Installation"],
+    stepNotes: ["Sie sind hier", "Dauert eine Minute", "Wir prüfen die Details vor Ort", "Meist 3–5 Tage vor Ort"],
+    surveyNext: "Wir melden uns innerhalb von 2 Werktagen",
+    accept: "Angebot annehmen",
+    accepted: "Angebot angenommen",
+    acceptedNote: "Vielen Dank. Wir rufen Sie innerhalb von 2 Werktagen an, um die technische Begehung zu vereinbaren.",
+    undo: "Rückgängig",
+    ask: "Frage stellen",
+    askPlaceholder: "Ihre Frage an Testaccount Hai …",
+    send: "Senden",
+    sent: "Gesendet. Wir antworten per E-Mail, meist noch am selben Tag.",
+    validity: (d: string) => `Gültig bis ${d}. Sie können innerhalb von 14 Tagen nach Annahme kostenfrei widerrufen.`,
     pdfLead: "Sie können Ihre Kostenschätzung auch als PDF herunterladen.",
     pdfSub: "Klicken Sie einfach auf die Schaltfläche.",
     pdfBtn: "PDF ansehen",
@@ -121,7 +149,7 @@ const COPY = {
       { title: "Ihre Anlage", open: true, items: ["Solaranlage", "Solarkomponenten", "Stromertrag", "Energiespeicher", "Wärmepumpe", "Alle Komponenten"] },
       { title: "Ihr Zuhause", open: false, items: ["Gebäude", "Ihr Haushalt", "Ihre Wärmebilanz"] },
       { title: "Kosten und Ersparnis", open: false, items: ["Wirtschaftlichkeit", "Zukünftige Tarife"] },
-      { title: "Nächste Schritte", open: false, items: ["Angebot annehmen"] },
+      { title: "Nächste Schritte", open: false, items: ["Angebot annehmen"], target: "next" },
       { title: "Dokumente", open: false, items: ["Datenblätter", "MCS-Leistungsprognose Wärmepumpe", "MCS-Schallprüfung", "MCS-Kerninformationen", "MCS-Leistungsprognose PV", "Wärmeverlust und Heizkörpertausch", "MCS-Wärmepumpenvorschlag", "MCS-Verschattungsdiagramm"] },
     ] as NavGroup[],
     langName: "Deutsch",
@@ -136,6 +164,40 @@ const chevron = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4
 
 // Which nav groups the customer has opened or closed, kept across language switches.
 const openGroups = new Map<number, boolean>();
+// Demo state for the call to action, also kept across language switches.
+let accepted = false;
+let asking = false;
+let questionSent = false;
+
+const tick = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function renderNextSteps(t: (typeof COPY)[Lang]) {
+  // Reading the offer is step 1; accepting completes steps 1 and 2 and makes the survey current.
+  const current = accepted ? 2 : 0;
+  const steps = t.steps.map((label, i) => {
+    const state = i < current ? "done" : i === current ? "current" : "";
+    const note = state === "done" ? "" : accepted && i === 2 ? t.surveyNext : t.stepNotes[i];
+    return `<li class="${state}"><span class="step-dot">${state === "done" ? tick : i + 1}</span>
+      <div><b>${label}</b><small>${note}</small></div></li>`;
+  }).join("");
+  const date = new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long", year: "numeric" }).format(VALID_UNTIL);
+
+  return `<section class="next" id="next">
+    <h3>${t.nextTitle}</h3>
+    <ol class="offer-steps">${steps}</ol>
+    ${accepted
+      ? `<div class="accepted"><span class="step-dot done">${tick}</span><div><b>${t.accepted}</b><p>${t.acceptedNote}</p></div>
+          <button class="link-btn" data-cta="undo">${t.undo}</button></div>`
+      : `<div class="cta-row">
+          <button class="cta" data-cta="accept">${t.accept} →</button>
+          <button class="cta-secondary" data-cta="ask" aria-expanded="${asking}">${t.ask}</button>
+        </div>`}
+    ${!accepted && asking ? (questionSent
+      ? `<p class="ask-sent">${t.sent}</p>`
+      : `<div class="ask"><textarea rows="3" placeholder="${t.askPlaceholder}"></textarea><button class="cta-secondary" data-cta="send">${t.send}</button></div>`) : ""}
+    <p class="validity">${t.validity(date)}</p>
+  </section>`;
+}
 
 export function renderUpdated(lang: Lang): string {
   const t = COPY[lang];
@@ -145,7 +207,7 @@ export function renderUpdated(lang: Lang): string {
     const open = openGroups.get(gi) ?? g.open;
     return `<div class="nav-group ${open ? "open" : ""}">
       <button class="nav-group-head" data-group="${gi}" aria-expanded="${open}">${chevron}<span>${g.title}</span><span class="nav-count">${g.items.length}</span></button>
-      <div class="nav-items">${g.items.map((n, i) => `<button class="${gi === 0 && i === 0 ? "active" : ""}">${n}</button>`).join("")}</div>
+      <div class="nav-items">${g.items.map((n, i) => `<button class="${gi === 0 && i === 0 ? "active" : ""}" ${g.target ? `data-target="${g.target}"` : ""}>${n}</button>`).join("")}</div>
     </div>`;
   }).join("");
 
@@ -186,6 +248,7 @@ export function renderUpdated(lang: Lang): string {
                 <div class="stats">${t.stats.map(([n, l]) => `<div><b>${n}</b><span>${l}</span></div>`).join("")}</div>
                 <p class="estimates">${t.estimates}</p>
               </section>
+              ${renderNextSteps(t)}
             </div>
             <div class="offer-art">
               ${house(t.labels, true, t.houseAria)}
@@ -206,6 +269,7 @@ export function renderUpdated(lang: Lang): string {
 export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
   const offer = root.querySelector<HTMLElement>(".offer.updated");
   if (!offer) return;
+  const currentLang = (offer.getAttribute("lang") ?? "en") as Lang;
 
   // Linked highlight: a product in the picture, its tick line and its cost row light up together.
   let pinned: Item | null = null;
@@ -242,10 +306,23 @@ export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
     const lang = t.closest<HTMLElement>("[data-lang]")?.dataset.lang as Lang | undefined;
     if (lang) return rerender(lang);
 
+    const cta = t.closest<HTMLElement>("[data-cta]")?.dataset.cta;
+    if (cta) {
+      if (cta === "accept") accepted = true;
+      if (cta === "undo") accepted = false;
+      if (cta === "ask") { asking = !asking; questionSent = false; }
+      if (cta === "send") questionSent = true;
+      rerender(currentLang);
+      root.querySelector("#next")?.scrollIntoView({ block: "nearest" });
+      if (cta === "ask" && asking) root.querySelector<HTMLTextAreaElement>(".ask textarea")?.focus();
+      return;
+    }
+
     const navItem = t.closest<HTMLElement>(".nav-items button");
     if (navItem) {
       offer.querySelectorAll(".nav-items button.active").forEach((b) => b.classList.remove("active"));
       navItem.classList.add("active");
+      if (navItem.dataset.target) root.querySelector(`#${navItem.dataset.target}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   });
   offer.addEventListener("keydown", (e) => {

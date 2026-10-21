@@ -26,7 +26,7 @@ export function renderChanges(): string {
   return `
     <div class="changes">
       <h1>Screen C: three changes</h1>
-      <p class="lead">Screen C is the first page of the digital offer the customer sees, usually with the installer beside them on site, right after the home survey. It has to explain the price and make saying yes easy. These are the three changes in the updated screen.</p>
+      <p class="lead">Screen C is the digital offer an end customer receives. It has to explain the price and make saying yes easy. These are the three changes in the updated screen.</p>
       <ol class="change-list">
         ${CHANGES.map((c, i) => `
           <li class="change">

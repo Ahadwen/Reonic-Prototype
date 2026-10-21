@@ -63,7 +63,7 @@
 .nav-items button { padding: 4px 0 !important; font-size: 13.5px !important; }
 
 .offer.updated .offer-art { position: sticky; top: calc((var(--bar-h) + var(--tabs-h)) / var(--zoom, 1) + 16px); }
-.house-hint { text-align: center; color: #8a8a8a; font-size: 13px; margin: 8px 0 0; }
+.house-hint { text-align: center; color: #8a8a8a; font-size: 13px; margin: 4px 0 0; }
 
 /* Linked highlight between picture, ticks and costs */
 .offer.updated [data-item] { transition: background-color 0.15s, color 0.15s, box-shadow 0.15s; cursor: pointer; }
@@ -92,10 +92,10 @@
 .stats span { font-size: 13px; color: #555; line-height: 1.35; display: block; margin-top: 2px; }
 .estimates { font-size: 12px !important; color: #8a8a8a; margin: 10px 0 0 !important; }
 
-/* Side column: nav on top, the call to action pinned below it */
-.offer-side { position: sticky; top: calc((var(--bar-h) + var(--tabs-h)) / var(--zoom, 1)); height: calc((100vh - var(--bar-h) - var(--tabs-h)) / var(--zoom, 1) - var(--offer-head-h)); align-self: start; display: flex; flex-direction: column; border-right: 1px solid #eeeef0; }
-.offer-side .offer-nav { position: static; max-height: none; flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 12px; }
-.cta-panel { margin: 0 16px 16px; border: 1.5px solid #1f3d4f; border-radius: 14px; padding: 16px; background: #fff; box-shadow: 0 6px 20px rgba(31, 61, 79, 0.1); display: flex; flex-direction: column; gap: 12px; }
+/* Call to action: under the house, beside the price */
+.cta-panel { margin-top: 16px; border: 1.5px solid #1f3d4f; border-radius: 14px; padding: 16px 18px; background: #fff; box-shadow: 0 6px 20px rgba(31, 61, 79, 0.1); display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; align-items: start; }
+.cta-panel > .cta-price, .cta-panel > .validity { grid-column: 1 / -1; }
+.cta-actions { display: flex; flex-direction: column; gap: 10px; }
 .cta-panel.flash { animation: flash 1.2s ease-out; }
 @keyframes flash { 0%, 40% { box-shadow: 0 0 0 6px #ffd2a0; } 100% { box-shadow: 0 6px 20px rgba(31, 61, 79, 0.1); } }
 .cta-price { display: flex; justify-content: space-between; align-items: baseline; }

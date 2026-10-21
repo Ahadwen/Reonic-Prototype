@@ -182,8 +182,8 @@ let signature = "";   // data URL of the signature, shown once accepted
 
 const tick = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-// The call to action lives in the side column, under the nav, so it stays in view whichever
-// section of the offer the customer opens.
+// The call to action sits under the house illustration, beside the price, and sticks with it
+// while the customer scrolls, so the next step stays in view.
 function renderCta(t: (typeof COPY)[Lang], price: string) {
   const date = (d: Date) => new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long" }).format(d);
   // The survey is behind them; the offer is current until they open the signature box, then signing is.
@@ -208,7 +208,7 @@ function renderCta(t: (typeof COPY)[Lang], price: string) {
   return `<section class="cta-panel" id="cta">
     <div class="cta-price"><span>${t.yourPrice}</span><b>${price}</b></div>
     <ol class="offer-steps">${steps}</ol>
-    ${actions}
+    <div class="cta-actions">${actions}</div>
     <p class="validity">${t.validity(validUntil)}</p>
   </section>`;
 }
@@ -292,10 +292,7 @@ export function renderUpdated(lang: Lang): string {
         </div>
       </header>
       <div class="offer-body">
-        <aside class="offer-side">
-          <nav class="offer-nav grouped">${nav}</nav>
-          ${renderCta(t, money(total - GRANT, t.locale, 2))}
-        </aside>
+        <nav class="offer-nav grouped">${nav}</nav>
         <div class="offer-main">
           <section class="offer-glance">
             <div class="offer-text">
@@ -320,6 +317,7 @@ export function renderUpdated(lang: Lang): string {
             <div class="offer-art">
               ${house(t.labels, true, t.houseAria)}
               <p class="house-hint">${t.houseHint}</p>
+              ${renderCta(t, money(total - GRANT, t.locale, 2))}
             </div>
           </section>
           <div class="offer-pdf">

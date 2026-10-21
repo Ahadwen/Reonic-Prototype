@@ -16,9 +16,9 @@ const CHANGES = [
   },
   {
     title: "The illustration linked to the costs",
-    problem: "The house picture is decorative. The tick marks next to it are the same for every customer, and nothing ties the products shown to what they cost.",
+    problem: "The house picture shows which products are in the offer, but it's static: nothing ties a product in the picture to what it costs or to what it does for the customer.",
     change: "Pointing at a product in the picture (or tapping it on a tablet) highlights it, its line under \"At a glance\" and its cost row. Pointing at a cost row lights up the product in the picture.",
-    why: "It turns a generic picture into an explanation of this customer's offer, and helps the installer walk through it item by item.",
+    why: "The picture becomes a way into the price: the customer can see what each product costs, and the installer can walk through the offer item by item.",
   },
 ];
 

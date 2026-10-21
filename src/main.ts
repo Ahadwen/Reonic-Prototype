@@ -71,7 +71,7 @@ const PARTS: Record<PartId, { label: string; title: string; teaser: string; href
         <li><b>The price has no context.</b> £59,500 sits under generic benefit statements, with no breakdown, savings or payback.</li>
         <li><b>The navigation overwhelms.</b> There are 22 items, "Your heat balance" appears twice, and the MCS compliance documents sit alongside the sales story.</li>
         <li><b>There's no clear next step.</b> "Accept" is buried in the nav; the most prominent button is "View PDF".</li>
-        <li><b>Nothing is about this customer.</b> The benefits and illustration would read the same for any customer.</li>
+        <li><b>The illustration doesn't connect to the price.</b> It shows which products are in the offer, but nothing links a product to what it costs.</li>
       </ol>
 
       <h3>Next</h3>

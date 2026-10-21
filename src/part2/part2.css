@@ -136,3 +136,6 @@
 .sign-row.end { justify-content: flex-end; }
 .sign-row .hint { color: #777; font-size: 13px; margin-right: auto; }
 .sign-row .link-btn { margin-top: 0; }
+
+/* Keep the right-hand column (house + call to action) at illustration size on wide screens. */
+.offer.updated .offer-glance { grid-template-columns: minmax(0, 640px) minmax(0, 560px); }

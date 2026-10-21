@@ -80,9 +80,6 @@ const house = `<svg class="offer-house" viewBox="0 0 650 430" role="img" aria-la
 
 export function showPart2() {
   root.innerHTML = `
-    <div class="case-bar">
-      <a href="#">← Case study</a><span>Part 2 · Screen C: the digital offer, as given in the brief (recreated)</span>
-    </div>
     <div class="offer">
       <header class="offer-head">
         <div class="offer-logo">${logo}</div>

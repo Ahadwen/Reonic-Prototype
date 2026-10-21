@@ -1,42 +1,146 @@
 // Entry point: one site for both parts of the case study.
-//   #             home, with a card per part
+//   #             home, with a card per part; clicking a card opens its write-up
 //   #components   Part 1, the components list    (#import: the invoice import flow)
 //   #offer        Part 2, Screen C (the digital offer)
+// A case-study bar runs across the top of both parts, so they read as two sections of one piece of work.
 
 import { showPart1 } from "./part1.ts";
 import { showPart2 } from "./part2.ts";
 
+const bar = document.getElementById("case-bar")!;
 const home = document.getElementById("home")!;
 const part1 = document.getElementById("part1")!;
 const part2 = document.getElementById("part2")!;
 
-home.innerHTML = `
-  <div class="home">
-    <div class="eyebrow">Reonic · Product Management case study</div>
-    <h1>Two parts, one prototype</h1>
-    <p>Part 1 is a working prototype for the component database problem. Part 2 takes one screen apart and puts it back together.</p>
-    <div class="parts">
-      <a class="card part" href="#components">
-        <span class="label">Part 1 · Product thinking</span>
-        <h2>Invoice → Components</h2>
-        <p>Installers already have their supplier invoices. Upload one and every line is read, matched to the catalog and their own database, and added after a quick review.</p>
-        <span class="go">Open the prototype →</span>
-      </a>
-      <a class="card part" href="#offer">
-        <span class="label">Part 2 · Product taste</span>
-        <h2>Screen C: the digital offer</h2>
-        <p>The first page an end customer sees when they receive an offer: what gets in their way, and a better version.</p>
-        <span class="go">Open the screen →</span>
-      </a>
-    </div>
-  </div>`;
+type PartId = "part1" | "part2";
+
+const PARTS: Record<PartId, { label: string; title: string; teaser: string; href: string; cta: string; writeup: string }> = {
+  part1: {
+    label: "Part 1 · Product thinking",
+    title: "Invoice → Components",
+    teaser: "Installers already have their supplier invoices. Upload one and every line is read, matched to the catalog and their own database, and added after a quick review.",
+    href: "#components",
+    cta: "See the prototype",
+    writeup: `
+      <h3>The problem</h3>
+      <p>Installers spend too long setting up their component database. Every heat pump, battery and wallbox needs an article number, prices and specs, typed in one by one. The AI chat is faster but can get things wrong, and nobody enjoys checking its work line by line.</p>
+
+      <h3>The idea</h3>
+      <p>The data already exists. Every component an installer has bought is on a supplier invoice in their inbox. Upload the invoice, a PDF or a phone photo, and the components come out the other side, matched and ready to confirm.</p>
+
+      <h3>How it works</h3>
+      <ol>
+        <li><b>Read.</b> Claude reads every line: code, description, quantity and net price, as structured data. The line totals are checked against the invoice total to catch misreads.</li>
+        <li><b>Match by rules first.</b> Known supplier codes and manufacturer article numbers match instantly, without AI. Each match is checked against the installer's own database, so duplicates and price changes are flagged.</li>
+        <li><b>AI only where it's needed.</b> For the rest, the rules build a shortlist from the catalog and Claude picks one, or says it can't tell. It can only choose from the shortlist, so it can't invent a product.</li>
+        <li><b>Review and confirm.</b> Lines are grouped by what needs attention: decisions first, then new products, price changes and catalog matches. Sales prices are pre-filled at the installer's usual markup. One click adds everything.</li>
+        <li><b>Learn.</b> Confirming teaches the catalog that supplier's codes, so the next invoice from them matches by rule.</li>
+      </ol>
+
+      <h3>Why it fits Reonic</h3>
+      <ul>
+        <li>It uses something installers already have and already handle, so there's no new habit to learn.</li>
+        <li>It keeps working after onboarding: every new invoice updates prices and adds new models.</li>
+        <li>Each confirmed match is a verified supplier code for the central catalog, which helps with "our central database is often outdated".</li>
+      </ul>
+
+      <h3>Results so far</h3>
+      <ul>
+        <li>On two sample invoices (17 lines), every line ends up right, consistently over 3 runs.</li>
+        <li>The genuinely ambiguous Daikin, where two 8kW models fit the description, is left for the installer to decide instead of guessed.</li>
+        <li>An invoice takes about 12 seconds, at about $0.03 in AI costs.</li>
+        <li>Importing the same invoice a second time matches everything by rule, with no AI matching.</li>
+      </ul>
+
+      <h3>What's simulated</h3>
+      <p>The 43-item catalog stands in for Reonic's central database, and the supplier and invoices are invented. Changes are saved in your browser; "Reset demo data" in the sidebar starts over.</p>`,
+  },
+  part2: {
+    label: "Part 2 · Product taste",
+    title: "Screen C: the digital offer",
+    teaser: "The first page an end customer sees when they receive an offer: what gets in their way, and a better version.",
+    href: "#offer",
+    cta: "See the screen",
+    writeup: `
+      <h3>The screen</h3>
+      <p>Screen C is the first page of the digital offer an installer sends to their customer. It's the moment the customer decides whether to trust the offer, so it needs to explain the price and make the next step obvious. The prototype recreates it as given in the brief, flaws included, as the "before".</p>
+
+      <h3>What gets in the way</h3>
+      <ol>
+        <li><b>The greeting is broken.</b> "Sehr geehrte/r ," has no name, and it's German on an otherwise English page.</li>
+        <li><b>The price has no context.</b> £59,500 sits under generic benefit statements, with no breakdown, savings or payback.</li>
+        <li><b>The navigation overwhelms.</b> There are 22 items, "Your heat balance" appears twice, and the MCS compliance documents sit alongside the sales story.</li>
+        <li><b>There's no clear next step.</b> "Accept" is buried in the nav; the most prominent button is "View PDF".</li>
+        <li><b>Nothing is about this customer.</b> The benefits and illustration would read the same for any customer.</li>
+      </ol>
+
+      <h3>Next</h3>
+      <p>Pick three of these and design the improved version alongside the original.</p>`,
+  },
+};
+
+let openPart: PartId | null = null;
+
+function renderHome() {
+  const card = (id: PartId) => {
+    const p = PARTS[id];
+    const open = openPart === id;
+    return `<button class="card part ${open ? "open" : ""}" data-part="${id}" aria-expanded="${open}">
+      <span class="label">${p.label}</span>
+      <h2>${p.title}</h2>
+      <p>${p.teaser}</p>
+      <span class="go">${open ? "Hide the write-up ↑" : "Read the write-up ↓"}</span>
+    </button>`;
+  };
+  const p = openPart ? PARTS[openPart] : null;
+  home.innerHTML = `
+    <header class="home-band">
+      <div class="home-inner">
+        <div class="eyebrow">Reonic · Product Management case study</div>
+        <h1>Two parts, one prototype</h1>
+        <p>Part 1 is a working prototype for the component database problem. Part 2 takes one screen apart and puts it back together.</p>
+      </div>
+    </header>
+    <div class="home-inner">
+      <div class="parts">${card("part1")}${card("part2")}</div>
+      ${p ? `
+        <article class="card writeup" id="writeup">
+          <div class="writeup-head">
+            <div><span class="label">${p.label}</span><h2>${p.title}</h2></div>
+            <a class="btn primary big" href="${p.href}">${p.cta} →</a>
+          </div>
+          <div class="writeup-body">${p.writeup}</div>
+          <div class="writeup-foot"><a class="btn primary big" href="${p.href}">${p.cta} →</a></div>
+        </article>` : ""}
+    </div>`;
+}
+
+home.addEventListener("click", (e) => {
+  const id = (e.target as HTMLElement).closest<HTMLElement>("[data-part]")?.dataset.part as PartId | undefined;
+  if (!id) return;
+  openPart = openPart === id ? null : id;
+  renderHome();
+  if (openPart) document.getElementById("writeup")?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+function renderBar(current: PartId) {
+  const other: PartId = current === "part1" ? "part2" : "part1";
+  bar.innerHTML = `
+    <a href="#" class="bar-home">← Case study</a>
+    <span class="bar-current">${PARTS[current].label}: ${PARTS[current].title}</span>
+    <a href="${PARTS[other].href}" class="bar-other">${PARTS[other].label.split(" · ")[0]} →</a>`;
+}
 
 function route() {
   const hash = location.hash;
-  const page = hash === "#components" || hash === "#import" ? part1 : hash === "#offer" ? part2 : home;
+  const current: PartId | null = hash === "#components" || hash === "#import" ? "part1" : hash === "#offer" ? "part2" : null;
+  const page = current === "part1" ? part1 : current === "part2" ? part2 : home;
   for (const el of [home, part1, part2]) el.hidden = el !== page;
-  if (page === part1) showPart1(hash);
-  else if (page === part2) showPart2();
+  bar.hidden = !current;
+  if (current) renderBar(current);
+  if (current === "part1") showPart1(hash);
+  else if (current === "part2") showPart2();
+  else renderHome();
   window.scrollTo(0, 0);
 }
 

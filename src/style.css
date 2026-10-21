@@ -14,6 +14,8 @@
   --blue: #1d4ed8; --blue-bg: #dbeafe;
   --warn: #9a5b00; --warn-bg: #fff4e0;
   --error: #b91c1c;
+  --bar-h: 40px;
+  --case: #4c2fd6;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 14px;
   color: var(--text);
@@ -33,8 +35,8 @@ body { margin: 0; background: var(--bg); }
 button, input, select { font: inherit; color: inherit; }
 
 /* ---- Shell ---- */
-.shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
-.sidebar { background: var(--card); border-right: 1px solid var(--line); padding: 14px 10px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 0; height: 100vh; }
+.shell { display: grid; grid-template-columns: 232px 1fr; min-height: calc(100vh - var(--bar-h)); }
+.sidebar { background: var(--card); border-right: 1px solid var(--line); padding: 14px 10px; display: flex; flex-direction: column; gap: 16px; position: sticky; top: var(--bar-h); height: calc(100vh - var(--bar-h)); }
 .workspace { display: flex; gap: 10px; align-items: center; padding: 4px 6px; }
 .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--accent-text); display: grid; place-items: center; font-weight: 600; font-size: 12px; }
 .ws-name { font-weight: 600; font-size: 13px; }
@@ -156,15 +158,35 @@ details.collapsed[open] > summary { border-bottom: 1px solid var(--line); }
 
 pre { white-space: pre-wrap; font-size: 12px; background: var(--soft); padding: 12px; border-radius: 8px; overflow-x: auto; }
 
-/* ---- Case study home ---- */
-.home { max-width: 920px; margin: 0 auto; padding: 64px 24px; }
-.home .eyebrow { color: var(--accent); font-weight: 600; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
-.home h1 { font-size: 30px; margin: 6px 0 8px; }
-.home > p { color: var(--muted); margin: 0 0 32px; max-width: 620px; line-height: 1.55; }
-.parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-.part { display: flex; flex-direction: column; gap: 10px; padding: 22px; text-decoration: none; color: inherit; transition: border-color 0.15s, transform 0.15s; }
+/* ---- Case study wrapper: the bar over both parts, and the home page ---- */
+.case-bar { position: sticky; top: 0; z-index: 20; height: var(--bar-h); background: var(--case); color: #e6e0ff; font-size: 13px; padding: 0 16px; display: flex; gap: 16px; align-items: center; white-space: nowrap; overflow: hidden; font-family: Inter, system-ui, sans-serif; }
+.case-bar a { color: #fff; text-decoration: none; font-weight: 600; }
+.case-bar a:hover { text-decoration: underline; }
+.bar-current { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.bar-other { margin-left: auto; }
+
+.home-band { background: var(--case); color: #fff; padding: 56px 0 72px; }
+.home-inner { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+.home-band .eyebrow { color: #cfc4ff; font-weight: 600; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+.home-band h1 { font-size: 30px; margin: 6px 0 8px; }
+.home-band p { color: #e6e0ff; margin: 0; max-width: 620px; line-height: 1.55; }
+.parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: -40px; }
+.part { display: flex; flex-direction: column; gap: 10px; padding: 22px; text-align: left; font: inherit; color: inherit; cursor: pointer; transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s; box-shadow: 0 6px 24px rgba(30, 10, 90, 0.08); }
 .part:hover { border-color: var(--accent); transform: translateY(-2px); }
+.part.open { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: -1px; }
 .part .label { color: var(--muted); font-size: 13px; font-weight: 500; }
 .part h2 { font-size: 19px; }
 .part p { margin: 0; color: var(--muted); line-height: 1.5; }
 .part .go { margin-top: auto; padding-top: 8px; color: var(--accent); font-weight: 600; }
+
+.writeup { margin: 20px 0 64px; scroll-margin-top: 16px; }
+.writeup-head { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 20px 24px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--card); border-radius: 10px 10px 0 0; z-index: 1; }
+.writeup-head .label { color: var(--muted); font-size: 13px; font-weight: 500; }
+.writeup-head h2 { font-size: 20px; margin-top: 2px; }
+.writeup-body { padding: 8px 24px 8px; max-width: 760px; line-height: 1.6; }
+.writeup-body h3 { font-size: 15px; margin: 22px 0 6px; }
+.writeup-body p { margin: 0 0 10px; }
+.writeup-body ol, .writeup-body ul { margin: 0 0 10px; padding-left: 20px; }
+.writeup-body li { margin-bottom: 6px; }
+.writeup-foot { padding: 16px 24px 24px; }
+.btn.big { padding: 10px 18px; font-size: 15px; text-decoration: none; display: inline-block; }

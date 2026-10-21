@@ -172,18 +172,24 @@ function renderUpload(s: Extract<State, { view: "upload" }>) {
       <span class="muted">PDF, JPG, PNG or WebP</span>
       <input id="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" hidden />
     </label>
-    <h2 class="samples-title">Or try a sample invoice</h2>
-    <div class="sample-cards">
-      ${SAMPLES.map((x, i) => `<button class="card sample-card" data-sample="${i}">
-        <img src="${x.preview}" alt="" loading="lazy" />
-        <span><b>${esc(x.label)}</b><small>${esc(x.note)}</small></span>
-      </button>`).join("")}
-    </div>
     <div class="how">
       <div class="card"><b>1 · Read</b><span class="muted">AI reads codes, descriptions, quantities and prices from the invoice.</span></div>
       <div class="card"><b>2 · Match</b><span class="muted">Known codes match instantly. AI only decides the rest, and asks when unsure.</span></div>
       <div class="card"><b>3 · Confirm</b><span class="muted">You review, adjust prices and add everything in one click.</span></div>
-    </div>`;
+    </div>
+    <section class="demo-panel" aria-label="Demo sample invoices">
+      <div class="demo-head">
+        <span class="demo-tag">Demo</span>
+        <div><b>Sample invoices for this case study</b>
+          <p>Not part of the feature. Pick one to run it through the import, or use "Download invoice bundle" in the bar above to upload them yourself.</p></div>
+      </div>
+      <div class="sample-cards">
+        ${SAMPLES.map((x, i) => `<button class="sample-card" data-sample="${i}">
+          <img src="${x.preview}" alt="" loading="lazy" />
+          <span><b>${esc(x.label)}</b><small>${esc(x.note)}</small></span>
+        </button>`).join("")}
+      </div>
+    </section>`;
 
   const drop = document.getElementById("drop")!;
   const input = document.getElementById("file") as HTMLInputElement;

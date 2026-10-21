@@ -23,10 +23,10 @@ const PARTS: Record<PartId, { label: string; title: string; teaser: string; href
     cta: "See the prototype",
     writeup: `
       <h3>The problem</h3>
-      <p>Installers spend too long setting up their component database. Every heat pump, battery and wallbox needs an article number, prices and specs, typed in one by one. The AI chat is faster but can get things wrong, and nobody enjoys checking its work line by line.</p>
+      <p>Installers spend too long setting up their component database. Every heat pump, battery and wallbox needs an article number, prices and specs, typed in one by one.</p>
 
       <h3>The idea</h3>
-      <p>The data already exists. Every component an installer has bought is on a supplier invoice in their inbox. Upload the invoice, a PDF or a phone photo, and the components come out the other side, matched and ready to confirm.</p>
+      <p>The data already exists. Every component an installer has bought is on a supplier invoice in their inbox. We could remove most of the input time if the user uploads the invoice, either as a PDF or a phone photo, and the components come out the other side, matched and ready to confirm.</p>
 
       <h3>How it works</h3>
       <ol>
@@ -47,9 +47,9 @@ const PARTS: Record<PartId, { label: string; title: string; teaser: string; href
       <h3>Results so far</h3>
       <ul>
         <li>On two sample invoices (17 lines), every line ends up right, consistently over 3 runs.</li>
-        <li>The genuinely ambiguous Daikin, where two 8kW models fit the description, is left for the installer to decide instead of guessed.</li>
+        <li>Ambiguous cases, such as with 'Daikin', where two 8kW models fit the description, are left for the installer to decide, instead of being guessed.</li>
         <li>An invoice takes about 12 seconds, at about $0.03 in AI costs.</li>
-        <li>Importing the same invoice a second time matches everything by rule, with no AI matching.</li>
+        <li>Importing the same invoice a second time matches everything programmatically, with no AI usage.</li>
       </ul>
 
       <h3>What's simulated</h3>

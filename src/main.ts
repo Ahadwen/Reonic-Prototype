@@ -49,7 +49,7 @@ const PARTS: Record<PartId, { label: string; title: string; teaser: string; href
         <li>On two sample invoices (17 lines), every line ends up right, consistently over 3 runs.</li>
         <li>Ambiguous cases, such as with 'Daikin', where two 8kW models fit the description, are left for the installer to decide, instead of being guessed.</li>
         <li>An invoice takes about 12 seconds, at about $0.03 in AI costs.</li>
-        <li>Importing the same invoice a second time matches everything programmatically, with no AI usage.</li>
+        <li>Importing the same invoice a second time matches everything by code, so only the reading step uses AI.</li>
       </ul>
 
       <h3>What's simulated</h3>

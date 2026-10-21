@@ -117,10 +117,19 @@ tr.fresh td { background: var(--accent-soft); }
 .result-foot { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 12px 20px 16px; border-top: 1px solid var(--line); margin-top: 8px; }
 
 /* ---- Upload ---- */
-.drop { border: 1.5px dashed var(--line); border-radius: 12px; padding: 40px 20px; text-align: center; background: var(--card); cursor: pointer; }
+.drop { display: block; border: 1.5px dashed var(--line); border-radius: 12px; padding: 40px 20px; text-align: center; background: var(--card); cursor: pointer; }
+.drop .touch { display: none; }
+@media (hover: none) {
+  .drop .pointer { display: none; }
+  .drop .touch { display: block; }
+}
 .drop.over { border-color: var(--accent); background: var(--accent-soft); }
 .drop strong { display: block; font-size: 15px; margin-bottom: 4px; }
 .samples { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+@media (max-width: 760px) {
+  .drop { padding: 28px 16px; }
+  .samples { justify-content: flex-start; }
+}
 .how { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 20px; }
 .how .card { padding: 14px; }
 .how b { display: block; margin-bottom: 4px; }

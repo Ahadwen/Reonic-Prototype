@@ -163,7 +163,8 @@ function renderUpload(s: Extract<State, { view: "upload" }>) {
     </div>
     ${s.error ? `<div class="banner error">${esc(s.error)}</div>` : ""}
     <label class="drop" id="drop">
-      <strong>Drop a PDF or photo here, or click to choose</strong>
+      <strong class="pointer">Drop a PDF or photo here, or click to choose</strong>
+      <strong class="touch">Tap to upload a PDF or a photo of the invoice</strong>
       <span class="muted">PDF, JPG, PNG or WebP</span>
       <input id="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" hidden />
     </label>

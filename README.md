@@ -3,7 +3,7 @@
 One site for both parts of the case study. The home page (`#`) has a card per part; clicking one opens a write-up with a link to the prototype. A purple case-study bar runs across the top of both parts.
 
 - **Part 1 · Product thinking** (`#components`, `#import`): invoice → components, described below.
-- **Part 2 · Product taste** (`#offer`, `#offer/updated`): Screen C, the digital offer, as provided in the brief and updated, switchable with tabs.
+- **Part 2 · Product taste** (`#offer/changes`, `#offer`, `#offer/updated`): Screen C, the digital offer: the three changes, the screen as provided in the brief, and the updated screen, switchable with tabs.
 
 ## Part 1: Invoice → Components
 

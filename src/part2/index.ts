@@ -1,7 +1,9 @@
 // Part 2 of the case study: Screen C, the first page of the digital offer an end customer receives.
-// Tabs switch between the screen as provided in the brief (#offer) and the updated one (#offer/updated).
+// Tabs: the three changes (#offer/changes), the screen as provided in the brief (#offer),
+// and the updated one (#offer/updated).
 
 import "./part2.css";
+import { renderChanges } from "./changes.ts";
 import { renderOriginal } from "./original.ts";
 import { renderUpdated, wireUpdated, type Lang } from "./updated.ts";
 
@@ -22,15 +24,17 @@ window.addEventListener("resize", fitToWidth);
 
 export function showPart2(hash: string) {
   const updated = hash === "#offer/updated";
+  const changes = hash === "#offer/changes";
   const tab = (href: string, label: string, active: boolean) =>
     `<a href="${href}" class="${active ? "active" : ""}" ${active ? `aria-current="page"` : ""}>${label}</a>`;
 
   root.innerHTML = `
     <div class="offer-tabs" role="tablist">
-      ${tab("#offer", "Provided screen", !updated)}
+      ${tab("#offer/changes", "The 3 changes", changes)}
+      ${tab("#offer", "Provided screen", !updated && !changes)}
       ${tab("#offer/updated", "Updated screen", updated)}
     </div>
-    ${updated ? renderUpdated(lang) : renderOriginal()}`;
+    ${changes ? renderChanges() : updated ? renderUpdated(lang) : renderOriginal()}`;
 
   if (updated) {
     wireUpdated(root, (next) => {

@@ -1,7 +1,7 @@
 // Entry point: one site for both parts of the case study.
 //   #             home, with a card per part; clicking a card opens its write-up
 //   #components   Part 1, the components list    (#import: the invoice import flow)
-//   #offer        Part 2, Screen C as provided   (#offer/updated: the updated screen)
+//   #offer/changes  Part 2: the three changes   (#offer: Screen C as provided, #offer/updated: updated)
 // A case-study bar runs across the top of both parts, so they read as two sections of one piece of work.
 
 import { showPart1 } from "./part1.ts";
@@ -59,7 +59,7 @@ const PARTS: Record<PartId, { label: string; title: string; teaser: string; href
     label: "Part 2 · Product taste",
     title: "Screen C: the digital offer",
     teaser: "The first page an end customer sees when they receive an offer: what gets in their way, and a better version.",
-    href: "#offer",
+    href: "#offer/changes",
     cta: "See the screen",
     writeup: `
       <h3>The screen</h3>
@@ -134,7 +134,7 @@ function renderBar(current: PartId) {
 function route() {
   const hash = location.hash;
   const current: PartId | null = hash === "#components" || hash === "#import" ? "part1"
-    : hash === "#offer" || hash === "#offer/updated" ? "part2" : null;
+    : hash.startsWith("#offer") ? "part2" : null;
   const page = current === "part1" ? part1 : current === "part2" ? part2 : home;
   for (const el of [home, part1, part2]) el.hidden = el !== page;
   bar.hidden = !current;

@@ -15,12 +15,15 @@ import type {
   CatalogItem, ComponentType, ExtractedInvoice, InvoiceFile, LineMatch, MyComponent, Usage,
 } from "./types.ts";
 
-const SAMPLES = [
-  { label: "Invoice 1 · PDF", path: "samples/invoice-NRS-24817.pdf" },
-  { label: "Invoice 1 · photo", path: "samples/invoice-NRS-24817-photo.jpg" },
-  { label: "Invoice 2 · PDF", path: "samples/invoice-NRS-25033.pdf" },
-  { label: "Invoice 2 · photo", path: "samples/invoice-NRS-25033-photo.jpg" },
-];
+import { SAMPLES } from "./samples.ts";
+
+// The invoice being imported, so it can be shown while it's read and opened from the review.
+interface Doc {
+  kind: "image" | "pdf";
+  src: string;    // what to display
+  open: string;   // what "View invoice" opens
+  size?: number;  // bytes, for your own PDFs
+}
 
 const TYPE_LABEL: Record<ComponentType, string> = {
   heat_pump: "Heat pump", hot_water_cylinder: "Hot water cylinder", battery: "Battery", inverter: "Inverter",
@@ -38,6 +41,7 @@ const app = document.getElementById("app")!;
 
 interface Review {
   fileName: string;
+  doc: Doc;
   invoice: ExtractedInvoice;
   matches: LineMatch[];
   decisions: LineDecision[];
@@ -53,7 +57,7 @@ interface Review {
 type State =
   | { view: "components"; flash?: string; freshIds?: Set<string>; result?: ImportResult }
   | { view: "upload"; error?: string }
-  | { view: "processing"; fileName: string; step: 0 | 1 | 2 }
+  | { view: "processing"; fileName: string; doc: Doc; step: 0 | 1 | 2 }
   | { view: "review"; review: Review; error?: string; saving?: boolean };
 
 let state: State = { view: location.hash === "#import" ? "upload" : "components" };
@@ -168,9 +172,12 @@ function renderUpload(s: Extract<State, { view: "upload" }>) {
       <span class="muted">PDF, JPG, PNG or WebP</span>
       <input id="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp" hidden />
     </label>
-    <div class="samples">
-      <span class="muted">or try a sample:</span>
-      ${SAMPLES.map((x, i) => `<button class="btn" data-sample="${i}">${esc(x.label)}</button>`).join("")}
+    <h2 class="samples-title">Or try a sample invoice</h2>
+    <div class="sample-cards">
+      ${SAMPLES.map((x, i) => `<button class="card sample-card" data-sample="${i}">
+        <img src="${x.preview}" alt="" loading="lazy" />
+        <span><b>${esc(x.label)}</b><small>${esc(x.note)}</small></span>
+      </button>`).join("")}
     </div>
     <div class="how">
       <div class="card"><b>1 · Read</b><span class="muted">AI reads codes, descriptions, quantities and prices from the invoice.</span></div>
@@ -205,18 +212,41 @@ async function toInvoiceFile(blob: Blob): Promise<InvoiceFile> {
   return { base64: dataUrl.split(",")[1], mediaType };
 }
 
-async function process(fileName: string, blob: Blob) {
+let objectUrl: string | null = null;
+
+// How to show an uploaded file: samples come with a preview image; your own files are shown as they are.
+function docFor(blob: Blob, preview?: { src: string; open: string }): Doc {
+  if (objectUrl) URL.revokeObjectURL(objectUrl);
+  objectUrl = URL.createObjectURL(blob);
+  if (preview) return { kind: "image", src: preview.src, open: preview.open };
+  return { kind: blob.type === "application/pdf" ? "pdf" : "image", src: objectUrl, open: objectUrl, size: blob.size };
+}
+
+// Images are shown as they are. Your own PDFs get a file card rather than an embedded viewer,
+// which many browsers (mobile Safari, headless) don't render reliably.
+function renderDoc(doc: Doc, label: string) {
+  if (doc.kind === "image") return `<img src="${doc.src}" alt="${esc(label)}" />`;
+  const kb = doc.size ? `${Math.max(1, Math.round(doc.size / 1024))} KB` : "";
+  return `<div class="file-card">
+    <svg viewBox="0 0 40 48" aria-hidden="true"><path d="M4 2h22l10 10v32a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M26 2v10h10" fill="none" stroke="currentColor" stroke-width="2"/><text x="20" y="34" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">PDF</text></svg>
+    <b>${esc(label)}</b><span class="muted">${kb}</span>
+    <a class="btn" href="${doc.open}" target="_blank" rel="noopener">Open ↗</a>
+  </div>`;
+}
+
+async function process(fileName: string, blob: Blob, preview?: { src: string; open: string }) {
   const started = performance.now();
+  const doc = docFor(blob, preview);
   try {
-    setState({ view: "processing", fileName, step: 0 });
+    setState({ view: "processing", fileName, doc, step: 0 });
     // No API key in the browser: calls go through the claude-proxy Edge Function.
     const extraction = await extractInvoice(null, await toInvoiceFile(blob));
 
-    setState({ view: "processing", fileName, step: 1 });
+    setState({ view: "processing", fileName, doc, step: 1 });
     const [catalog, mine] = await Promise.all([store.getCatalog(), store.getMyComponents()]);
     const byRules = matchInvoice(extraction.invoice, catalog, mine);
 
-    setState({ view: "processing", fileName, step: 2 });
+    setState({ view: "processing", fileName, doc, step: 2 });
     const resolved = await resolveWithAI(null, byRules, catalog, mine);
 
     const markup = usualMarkup(mine);
@@ -226,7 +256,7 @@ async function process(fileName: string, blob: Blob) {
     setState({
       view: "review",
       review: {
-        fileName, invoice: extraction.invoice, matches: resolved.matches,
+        fileName, doc, invoice: extraction.invoice, matches: resolved.matches,
         decisions: initialDecisions(resolved.matches, catalog, markup),
         catalog, mine, markup, warnings,
         seconds: (performance.now() - started) / 1000,
@@ -243,11 +273,14 @@ function renderProcessing(s: Extract<State, { view: "processing" }>) {
   const steps = ["Reading the invoice", "Matching known codes", "Checking the rest with AI"];
   app.innerHTML = `
     <div class="page-head"><div><h1>Import from invoice</h1><p class="sub">${esc(s.fileName)}</p></div></div>
-    <div class="card progress">
-      <h2>Working on it…</h2>
-      <ol class="steps">${steps.map((label, i) => `
-        <li class="${i < s.step ? "done" : i === s.step ? "active" : ""}"><span class="dot">${i < s.step ? "✓" : ""}</span>${label}</li>`).join("")}
-      </ol>
+    <div class="processing">
+      <div class="card progress">
+        <h2>Working on it…</h2>
+        <ol class="steps">${steps.map((label, i) => `
+          <li class="${i < s.step ? "done" : i === s.step ? "active" : ""}"><span class="dot">${i < s.step ? "✓" : ""}</span>${label}</li>`).join("")}
+        </ol>
+      </div>
+      <figure class="card doc-preview ${s.step === 0 ? "scanning" : ""}">${renderDoc(s.doc, s.fileName)}</figure>
     </div>`;
 }
 
@@ -410,6 +443,7 @@ function renderReview(s: Extract<State, { view: "review" }>) {
         <p class="sub">${esc(r.invoice.supplierName)} · ${esc(r.invoice.invoiceDate)} · ${plural(r.matches.length, "line")} · net ${money(r.invoice.netTotal, r.invoice.currency)}</p></div>
       <span class="spacer"></span>
       <span class="muted">Read and matched in ${r.seconds.toFixed(0)}s${r.costUsd ? ` · ≈ $${r.costUsd.toFixed(3)}` : ""}</span>
+      <a class="btn" href="${r.doc.open}" target="_blank" rel="noopener">View invoice ↗</a>
     </div>
     ${s.error ? `<div class="banner error">${esc(s.error)}</div>` : ""}
     ${r.warnings.map((w) => `<div class="banner warn">${esc(w)}</div>`).join("")}
@@ -445,7 +479,7 @@ app.addEventListener("click", async (e) => {
   if (sample !== undefined) {
     const s = SAMPLES[Number(sample)];
     const res = await fetch(s.path);
-    return process(s.label, await res.blob());
+    return process(s.label, await res.blob(), { src: s.preview, open: s.path });
   }
 
   if (t.id === "confirm" && state.view === "review") {

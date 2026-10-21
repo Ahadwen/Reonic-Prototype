@@ -75,6 +75,7 @@ Never commit an API key. The site asks for one at runtime instead.
 | `src/match.ts` | Pipeline step 2: rule-based matching. Supplier code → manufacturer article no. → your own article no.; then duplicate and price-change check. Anything left gets a shortlist of candidates for the AI step or a person. |
 | `src/resolve.ts` | Pipeline step 3: one AI call per invoice picks from each shortlist (or says it's unclear, so a person decides), and reads lines with no catalog match into a type, manufacturer, model and specs for the new record. It can only pick shortlisted items, so it can't invent a match. |
 | `src/review.ts` | Pipeline step 4: the installer's decisions per line, and the changes they produce (new records, price updates, supplier codes to remember). Sales prices are suggested at the installer's usual markup, learned from their existing products. |
+| `src/samples.ts`, `src/zip.ts` | The sample invoices (shown as cards on the upload page) and the "Download invoice bundle" button in the case-study bar, which zips them in the browser |
 | `src/store.ts` | Data access behind a `Store` interface. Today: the JSON seed data plus localStorage. Later: Supabase. |
 | `src/types.ts` | Shared types |
 | `src/cost.ts` | Token → USD estimate |
@@ -95,7 +96,7 @@ Never commit an API key. The site asks for one at runtime instead.
 
 ## Sample invoices
 
-From a fictional wholesaler, *Northbridge Renewables Supply Ltd*, to a fictional installer, *Brightwell Heat & Solar Ltd*. Each comes as a clean PDF and a photo-style JPG, plus an `.expected.json` with the correct outcome for every line, used for measuring accuracy.
+From a fictional wholesaler, *Northbridge Renewables Supply Ltd*, to a fictional installer, *Brightwell Heat & Solar Ltd*. Each comes as a clean PDF and a photo-style JPG, plus an `.expected.json` with the correct outcome for every line, used for measuring accuracy. `public/samples/previews/` holds an image of each, used for the sample cards and while an invoice is being read (made with `pdftoppm` for the PDFs).
 
 ### NRS-INV-24817 (11 lines)
 

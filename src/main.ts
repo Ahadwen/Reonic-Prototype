@@ -6,6 +6,7 @@
 
 import { showPart1 } from "./part1.ts";
 import { showPart2 } from "./part2/index.ts";
+import { downloadBundle } from "./samples.ts";
 
 const bar = document.getElementById("case-bar")!;
 const home = document.getElementById("home")!;
@@ -156,6 +157,7 @@ function renderBar(current: PartId) {
   bar.innerHTML = `
     <a href="#" class="bar-home">← Case study</a>
     <span class="bar-current">${PARTS[current].label}: ${PARTS[current].title}</span>
+    ${current === "part1" ? `<button class="bar-download" id="download-bundle">↓ Download invoice bundle</button>` : ""}
     <a href="${PARTS[other].href}" class="bar-other">${PARTS[other].label.split(" · ")[0]} →</a>`;
 }
 
@@ -172,6 +174,13 @@ function route() {
   else renderHome();
   window.scrollTo(0, 0);
 }
+
+bar.addEventListener("click", async (e) => {
+  const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("#download-bundle");
+  if (!btn) return;
+  btn.disabled = true;
+  try { await downloadBundle(); } finally { btn.disabled = false; }
+});
 
 window.addEventListener("hashchange", route);
 route();

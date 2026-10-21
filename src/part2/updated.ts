@@ -24,7 +24,7 @@ const COSTS: { item: Item | "project"; amount: number }[] = [
 const GRANT = 7_500;
 const SAVINGS_PER_YEAR = 2_100;
 const VALID_UNTIL = new Date(2026, 10, 20);
-// The installer presents the offer on site, after the home survey.
+// The progress tracker shows a completed home survey before the offer.
 const SURVEY_DATE = new Date(2026, 9, 14);
 
 const COPY = {
@@ -213,7 +213,7 @@ function renderCta(t: (typeof COPY)[Lang], price: string) {
   </section>`;
 }
 
-// Signing opens over the page at full size, as it would when the tablet is handed to the customer.
+// Signing opens over the page at full size, so it's usable on any screen.
 function renderSignModal(t: (typeof COPY)[Lang]) {
   if (phase !== "signing") return "";
   return `<div class="sign-modal" role="dialog" aria-modal="true" aria-labelledby="sign-title">

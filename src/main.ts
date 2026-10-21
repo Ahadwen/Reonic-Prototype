@@ -58,12 +58,12 @@ const PARTS: Record<PartId, { label: string; title: string; teaser: string; href
   part2: {
     label: "Part 2 · Product taste",
     title: "Screen C: the digital offer",
-    teaser: "The first page an end customer sees when they receive an offer: what gets in their way, and a better version.",
+    teaser: "The digital offer an end customer receives: what gets in the way, and a better version.",
     href: "#offer/changes",
     cta: "See the screen",
     writeup: `
       <h3>The screen</h3>
-      <p>Screen C is the first page of the digital offer an installer sends to their customer. It's the moment the customer decides whether to trust the offer, so it needs to explain the price and make the next step obvious. The prototype recreates it as given in the brief, flaws included, as the "before".</p>
+      <p>Screen C is the digital offer an end customer receives. It needs to explain the price and make the next step obvious. The prototype recreates it as given in the brief, flaws included, as the "before".</p>
 
       <h3>What gets in the way</h3>
       <ol>

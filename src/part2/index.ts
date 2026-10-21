@@ -1,4 +1,4 @@
-// Part 2 of the case study: Screen C, the first page of the digital offer an end customer receives.
+// Part 2 of the case study: Screen C, the digital offer an end customer receives.
 // Tabs: the three changes (#offer/changes), the screen as provided in the brief (#offer),
 // and the updated one (#offer/updated).
 

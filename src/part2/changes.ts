@@ -11,13 +11,13 @@ const CHANGES = [
   {
     title: "Pricing with context, and a clear next step",
     problem: "£59,500 sits alone under three generic statements, with no breakdown, no grant and no savings. There's no obvious way to say yes: \"Accept\" is buried in the nav, and the most prominent button is \"View PDF\".",
-    change: "The price is broken down by product, with the Boiler Upgrade Scheme grant, the price the customer actually pays, and estimated savings, self-sufficiency and CO₂. Beside it, a panel shows where they are (home survey done, offer now, then sign, then installation), with \"Accept and sign\" as the main action. Signing opens a signature pad, made for the installer handing over a tablet on site. \"Decide later: email me this offer\" is the alternative.",
+    change: "The price is broken down by product, with the Boiler Upgrade Scheme grant, the price the customer actually pays, and estimated savings, self-sufficiency and CO₂. Beside it, a panel shows the customer's progress (home survey, this offer, signing, installation), with \"Accept and sign\" as the main action. Signing opens a signature pad that works with a finger or a mouse. \"Decide later: email me this offer\" is the alternative.",
     why: "Price is what decides the sale. The customer should understand what they're paying for, what they get back, and what happens when they say yes, without leaving the page.",
   },
   {
     title: "The illustration linked to the costs",
     problem: "The house picture shows which products are in the offer, but it's static: nothing ties a product in the picture to what it costs or to what it does for the customer.",
-    change: "Pointing at a product in the picture (or tapping it on a tablet) highlights it, its line under \"At a glance\" and its cost row. Pointing at a cost row lights up the product in the picture.",
+    change: "Pointing at a product in the picture (or tapping it on a touchscreen) highlights it, its line under \"At a glance\" and its cost row. Pointing at a cost row lights up the product in the picture.",
     why: "The picture becomes a way into the price: the customer can see what each product costs, and the installer can walk through the offer item by item.",
   },
 ];

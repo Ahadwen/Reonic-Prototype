@@ -112,9 +112,15 @@
 .cta:hover { background: #dc7000; }
 .cta-secondary { background: #fff; color: #1f3d4f; border: 1.5px solid #1f3d4f; border-radius: 10px; padding: 12px 20px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
 .cta-secondary:hover { background: #f2f6f8; }
-.ask { display: flex; gap: 10px; align-items: flex-end; margin-top: 12px; }
-.ask textarea { flex: 1; font: inherit; font-size: 15px; border: 1px solid #cfd2d6; border-radius: 8px; padding: 10px 12px; resize: vertical; }
-.ask-sent { color: #1b7a3c; font-size: 14px !important; margin: 12px 0 0 !important; }
+.cta:disabled { background: #e9c7a1; box-shadow: none; cursor: not-allowed; }
+.later-sent { color: #1b7a3c; font-size: 14px !important; margin: 0 !important; max-width: 360px; }
+.sign { display: flex; flex-direction: column; gap: 10px; }
+.sign b { font-size: 16px; }
+.sign-pad { width: 100%; height: 150px; border: 1.5px dashed #9aa5ad; border-radius: 10px; background: #fbfcfd linear-gradient(to top, transparent 34px, #cfd5da 34px, #cfd5da 35px, transparent 35px); touch-action: none; cursor: crosshair; }
+.sign-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.sign-row .hint { color: #777; font-size: 13px; margin-right: auto; }
+.sign-row .link-btn { margin-left: 0; }
+.signed { display: block; height: 48px; margin-top: 8px; }
 .accepted { display: flex; gap: 14px; align-items: flex-start; background: #ecf7f0; border-radius: 10px; padding: 14px 16px; }
 .accepted b { color: #1b7a3c; font-size: 17px; }
 .accepted p { margin: 2px 0 0 !important; font-size: 15px !important; }

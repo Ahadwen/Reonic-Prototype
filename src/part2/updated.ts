@@ -24,6 +24,8 @@ const COSTS: { item: Item | "project"; amount: number }[] = [
 const GRANT = 7_500;
 const SAVINGS_PER_YEAR = 2_100;
 const VALID_UNTIL = new Date(2026, 10, 20);
+// The installer presents the offer on site, after the home survey.
+const SURVEY_DATE = new Date(2026, 9, 14);
 
 const COPY = {
   en: {
@@ -64,17 +66,21 @@ const COPY = {
     ],
     estimates: "Estimates based on your household's usage. See Costs and savings for the details.",
     nextTitle: "Next steps",
-    steps: ["Review your offer", "Accept online", "Technical survey", "Installation"],
-    stepNotes: ["You are here", "Takes a minute", "We visit to confirm the details", "Usually 3–5 days on site"],
-    surveyNext: "We'll call within 2 working days",
-    accept: "Accept offer",
-    accepted: "Offer accepted",
-    acceptedNote: "Thank you. We'll call you within 2 working days to book your technical survey.",
+    steps: ["Home survey", "Your offer", "Sign", "Installation"],
+    stepNotes: ["", "You are here", "Here on screen, today", "We'll agree a date with you"],
+    surveyDone: (d: string) => `Completed ${d}`,
+    installNext: "We'll call within 2 working days to agree a date",
+    accept: "Accept and sign",
+    signTitle: "Sign to accept this offer",
+    signHint: "Sign with your finger or mouse in the box.",
+    signClear: "Clear",
+    signConfirm: "Confirm and accept",
+    cancel: "Cancel",
+    accepted: "Offer accepted and signed",
+    acceptedNote: `Thank you, ${CUSTOMER.title.en} ${CUSTOMER.surname}. A copy is on its way to your email. We'll call within 2 working days to agree an installation date.`,
     undo: "Undo",
-    ask: "Ask a question",
-    askPlaceholder: "Your question for Testaccount Hai…",
-    send: "Send",
-    sent: "Sent. We'll reply by email, usually the same day.",
+    later: "Decide later: email me this offer",
+    laterSent: "Sent to your email. You can accept it from there any time before the date below.",
     validity: (d: string) => `Valid until ${d}. You can cancel free of charge within 14 days of accepting.`,
     pdfLead: "You can also download your cost estimate as a PDF.",
     pdfSub: "Simply click the button.",
@@ -128,17 +134,21 @@ const COPY = {
     ],
     estimates: "Schätzwerte auf Basis Ihres Verbrauchs. Details unter Kosten und Ersparnis.",
     nextTitle: "Nächste Schritte",
-    steps: ["Angebot prüfen", "Online annehmen", "Technische Begehung", "Installation"],
-    stepNotes: ["Sie sind hier", "Dauert eine Minute", "Wir prüfen die Details vor Ort", "Meist 3–5 Tage vor Ort"],
-    surveyNext: "Wir melden uns innerhalb von 2 Werktagen",
-    accept: "Angebot annehmen",
-    accepted: "Angebot angenommen",
-    acceptedNote: "Vielen Dank. Wir rufen Sie innerhalb von 2 Werktagen an, um die technische Begehung zu vereinbaren.",
+    steps: ["Vor-Ort-Termin", "Ihr Angebot", "Unterschreiben", "Installation"],
+    stepNotes: ["", "Sie sind hier", "Hier am Bildschirm, heute", "Den Termin stimmen wir mit Ihnen ab"],
+    surveyDone: (d: string) => `Erledigt am ${d}`,
+    installNext: "Wir melden uns innerhalb von 2 Werktagen für einen Termin",
+    accept: "Annehmen und unterschreiben",
+    signTitle: "Unterschreiben Sie, um das Angebot anzunehmen",
+    signHint: "Unterschreiben Sie mit dem Finger oder der Maus im Feld.",
+    signClear: "Löschen",
+    signConfirm: "Bestätigen und annehmen",
+    cancel: "Abbrechen",
+    accepted: "Angebot angenommen und unterschrieben",
+    acceptedNote: `Vielen Dank, ${CUSTOMER.title.de} ${CUSTOMER.surname}. Eine Kopie ist per E-Mail unterwegs. Wir melden uns innerhalb von 2 Werktagen, um einen Installationstermin zu vereinbaren.`,
     undo: "Rückgängig",
-    ask: "Frage stellen",
-    askPlaceholder: "Ihre Frage an Testaccount Hai …",
-    send: "Senden",
-    sent: "Gesendet. Wir antworten per E-Mail, meist noch am selben Tag.",
+    later: "Später entscheiden: Angebot per E-Mail senden",
+    laterSent: "An Ihre E-Mail gesendet. Sie können es dort bis zum unten genannten Datum annehmen.",
     validity: (d: string) => `Gültig bis ${d}. Sie können innerhalb von 14 Tagen nach Annahme kostenfrei widerrufen.`,
     pdfLead: "Sie können Ihre Kostenschätzung auch als PDF herunterladen.",
     pdfSub: "Klicken Sie einfach auf die Schaltfläche.",
@@ -165,38 +175,86 @@ const chevron = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4
 // Which nav groups the customer has opened or closed, kept across language switches.
 const openGroups = new Map<number, boolean>();
 // Demo state for the call to action, also kept across language switches.
-let accepted = false;
-let asking = false;
-let questionSent = false;
+// "offer": reading it; "signing": the signature box is open; "accepted": signed.
+let phase: "offer" | "signing" | "accepted" = "offer";
+let emailed = false;
+let signature = "";   // data URL of the signature, shown once accepted
 
 const tick = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 function renderNextSteps(t: (typeof COPY)[Lang]) {
-  // Reading the offer is step 1; accepting completes steps 1 and 2 and makes the survey current.
-  const current = accepted ? 2 : 0;
+  const date = (d: Date) => new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long" }).format(d);
+  // The survey is behind them; the offer is current until they open the signature box, then signing is.
+  const current = phase === "accepted" ? 3 : phase === "signing" ? 2 : 1;
   const steps = t.steps.map((label, i) => {
     const state = i < current ? "done" : i === current ? "current" : "";
-    const note = state === "done" ? "" : accepted && i === 2 ? t.surveyNext : t.stepNotes[i];
+    const note = i === 0 ? t.surveyDone(date(SURVEY_DATE))
+      : state === "done" ? ""
+      : phase === "accepted" && i === 3 ? t.installNext
+      : t.stepNotes[i];
     return `<li class="${state}"><span class="step-dot">${state === "done" ? tick : i + 1}</span>
       <div><b>${label}</b><small>${note}</small></div></li>`;
   }).join("");
-  const date = new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long", year: "numeric" }).format(VALID_UNTIL);
+  const validUntil = new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long", year: "numeric" }).format(VALID_UNTIL);
+
+  const body = {
+    offer: `<div class="cta-row">
+        <button class="cta" data-cta="sign">${t.accept} →</button>
+        ${emailed ? `<p class="later-sent">${t.laterSent}</p>` : `<button class="cta-secondary" data-cta="later">${t.later}</button>`}
+      </div>`,
+    signing: `<div class="sign">
+        <b>${t.signTitle}</b>
+        <canvas class="sign-pad" width="760" height="180" aria-label="${t.signHint}"></canvas>
+        <div class="sign-row">
+          <span class="hint">${t.signHint}</span>
+          <button class="link-btn" data-cta="clear">${t.signClear}</button>
+          <button class="cta-secondary" data-cta="cancel">${t.cancel}</button>
+          <button class="cta" data-cta="confirm" disabled>${t.signConfirm}</button>
+        </div>
+      </div>`,
+    accepted: `<div class="accepted"><span class="step-dot done">${tick}</span>
+        <div><b>${t.accepted}</b><p>${t.acceptedNote}</p>${signature ? `<img class="signed" src="${signature}" alt="" />` : ""}</div>
+        <button class="link-btn" data-cta="undo">${t.undo}</button></div>`,
+  }[phase];
 
   return `<section class="next" id="next">
     <h3>${t.nextTitle}</h3>
     <ol class="offer-steps">${steps}</ol>
-    ${accepted
-      ? `<div class="accepted"><span class="step-dot done">${tick}</span><div><b>${t.accepted}</b><p>${t.acceptedNote}</p></div>
-          <button class="link-btn" data-cta="undo">${t.undo}</button></div>`
-      : `<div class="cta-row">
-          <button class="cta" data-cta="accept">${t.accept} →</button>
-          <button class="cta-secondary" data-cta="ask" aria-expanded="${asking}">${t.ask}</button>
-        </div>`}
-    ${!accepted && asking ? (questionSent
-      ? `<p class="ask-sent">${t.sent}</p>`
-      : `<div class="ask"><textarea rows="3" placeholder="${t.askPlaceholder}"></textarea><button class="cta-secondary" data-cta="send">${t.send}</button></div>`) : ""}
-    <p class="validity">${t.validity(date)}</p>
+    ${body}
+    <p class="validity">${t.validity(validUntil)}</p>
   </section>`;
+}
+
+// Draw-to-sign on the canvas; enables the confirm button once there's ink.
+function wireSignaturePad(root: HTMLElement) {
+  const pad = root.querySelector<HTMLCanvasElement>(".sign-pad");
+  const confirm = root.querySelector<HTMLButtonElement>('[data-cta="confirm"]');
+  if (!pad || !confirm) return;
+  const ctx = pad.getContext("2d")!;
+  ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#1f3d4f";
+  let drawing = false;
+  let ink = 0;
+  const at = (e: PointerEvent) => {
+    const r = pad.getBoundingClientRect();
+    return [(e.clientX - r.left) * (pad.width / r.width), (e.clientY - r.top) * (pad.height / r.height)] as const;
+  };
+  pad.addEventListener("pointerdown", (e) => {
+    drawing = true; pad.setPointerCapture(e.pointerId);
+    const [x, y] = at(e); ctx.beginPath(); ctx.moveTo(x, y);
+  });
+  pad.addEventListener("pointermove", (e) => {
+    if (!drawing) return;
+    const [x, y] = at(e); ctx.lineTo(x, y); ctx.stroke();
+    if (++ink > 8) confirm.disabled = false;
+  });
+  const stop = () => { drawing = false; };
+  pad.addEventListener("pointerup", stop);
+  pad.addEventListener("pointercancel", stop);
+  root.querySelector('[data-cta="clear"]')?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    ctx.clearRect(0, 0, pad.width, pad.height); ink = 0; confirm.disabled = true;
+  });
+  confirm.addEventListener("click", () => { signature = pad.toDataURL("image/png"); }, { capture: true });
 }
 
 export function renderUpdated(lang: Lang): string {
@@ -270,6 +328,7 @@ export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
   const offer = root.querySelector<HTMLElement>(".offer.updated");
   if (!offer) return;
   const currentLang = (offer.getAttribute("lang") ?? "en") as Lang;
+  wireSignaturePad(root);
 
   // Linked highlight: a product in the picture, its tick line and its cost row light up together.
   let pinned: Item | null = null;
@@ -307,14 +366,14 @@ export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
     if (lang) return rerender(lang);
 
     const cta = t.closest<HTMLElement>("[data-cta]")?.dataset.cta;
-    if (cta) {
-      if (cta === "accept") accepted = true;
-      if (cta === "undo") accepted = false;
-      if (cta === "ask") { asking = !asking; questionSent = false; }
-      if (cta === "send") questionSent = true;
+    if (cta && cta !== "clear") {
+      if (cta === "sign") phase = "signing";
+      if (cta === "cancel") phase = "offer";
+      if (cta === "confirm") phase = "accepted";
+      if (cta === "undo") { phase = "offer"; signature = ""; }
+      if (cta === "later") emailed = true;
       rerender(currentLang);
       root.querySelector("#next")?.scrollIntoView({ block: "nearest" });
-      if (cta === "ask" && asking) root.querySelector<HTMLTextAreaElement>(".ask textarea")?.focus();
       return;
     }
 

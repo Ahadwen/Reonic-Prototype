@@ -5,7 +5,11 @@ import { extractInvoice, checkTotals } from "./extract.ts";
 import { costUsd } from "./cost.ts";
 import { matchInvoice } from "./match.ts";
 import { resolveWithAI } from "./resolve.ts";
-import { applyPlan, choose, initialDecisions, planChanges, usualMarkup, type LineDecision, type Plan } from "./review.ts";
+import {
+  applyPlan, choose, initialDecisions, planChanges, summarise, usualMarkup,
+  MANUAL_MINUTES_PER_COMPONENT, MANUAL_MINUTES_PER_PRICE_UPDATE,
+  type ImportSummary, type LineDecision, type Plan,
+} from "./review.ts";
 import { JsonStore } from "./store.ts";
 import type {
   CatalogItem, ComponentType, ExtractedInvoice, InvoiceFile, LineMatch, MyComponent, Usage,
@@ -41,12 +45,13 @@ interface Review {
   mine: MyComponent[];
   markup: number;
   seconds: number;
+  reviewStartedAt: number;
   costUsd: number;
   warnings: string[];
 }
 
 type State =
-  | { view: "components"; flash?: string; freshIds?: Set<string> }
+  | { view: "components"; flash?: string; freshIds?: Set<string>; result?: ImportResult }
   | { view: "upload"; error?: string }
   | { view: "processing"; fileName: string; step: 0 | 1 | 2 }
   | { view: "review"; review: Review; error?: string; saving?: boolean };
@@ -60,6 +65,13 @@ function setState(next: State) {
   render();
 }
 
+interface ImportResult {
+  summary: ImportSummary;
+  processingSeconds: number;
+  reviewSeconds: number;
+  costUsd: number;
+}
+
 // ---------- Helpers ----------
 
 const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
@@ -69,7 +81,8 @@ const money = (n: number, cur = "GBP") => {
 };
 const pct = (n: number) => `${Math.round(n * 100)}%`;
 const margin = (purchase: number, sales: number) => (sales > 0 ? (sales - purchase) / sales : 0);
-const plural = (n: number, one: string, many = one + "s") => `${n} ${n === 1 ? one : many}`;
+const word = (n: number, one: string, many = one + "s") => (n === 1 ? one : many);
+const plural = (n: number, one: string, many = one + "s") => `${n} ${word(n, one, many)}`;
 
 function specPills(specs: Record<string, unknown>, max = 4) {
   const label = (k: string) => k.replace(/([A-Z])/g, " $1").toLowerCase();
@@ -89,6 +102,7 @@ async function renderComponents(s: Extract<State, { view: "components" }>) {
       <span class="spacer"></span>
       <button class="btn primary" data-go="upload">Import from invoice</button>
     </div>
+    ${s.result ? renderResult(s.result) : ""}
     ${s.flash ? `<div class="banner ok">${s.flash}</div>` : ""}
     <div class="card table-wrap"><table>
       <thead><tr><th>Name</th><th>Type</th><th>Article no.</th><th class="num">Purchase</th><th class="num">Sales</th><th class="num">Margin</th><th>Source</th><th>Updated</th></tr></thead>
@@ -105,6 +119,39 @@ async function renderComponents(s: Extract<State, { view: "components" }>) {
         </tr>`).join("")}
       </tbody>
     </table></div>`;
+}
+
+function renderResult(r: ImportResult) {
+  const s = r.summary;
+  const tile = (n: number | string, label: string) => `<div class="tile"><b>${n}</b><span>${label}</span></div>`;
+  const how = [
+    [s.byRule, "matched by code", "green"], [s.byAI, "matched by AI", "accent"], [s.byYou, "chosen by you", "red"],
+    [s.created, `new ${word(s.created, "product")}`, "blue"], [s.skipped, "skipped", ""], [s.ignored, "ignored", ""],
+  ].filter(([n]) => n) as [number, string, string][];
+  const fmtTime = (sec: number) => (sec < 90 ? `${Math.round(sec)}s` : `${Math.round(sec / 60)} min`);
+  return `<section class="card result">
+    <div class="result-head">
+      <span class="result-check" aria-hidden="true">✓</span>
+      <div><h2>Invoice ${esc(s.invoiceNumber)} imported</h2>
+        <p class="sub">${esc(s.supplierName)} · ${plural(s.lines, "line")} · read and matched in ${fmtTime(r.processingSeconds)}, reviewed in ${fmtTime(r.reviewSeconds)}${r.costUsd ? ` · AI cost ≈ $${r.costUsd.toFixed(2)}` : ""}</p></div>
+      <button class="btn close" data-dismiss-result aria-label="Close">×</button>
+    </div>
+    <div class="tiles">
+      ${tile(s.added, `${word(s.added, "component")} added`)}
+      ${tile(s.priceUpdates.length, `${word(s.priceUpdates.length, "price")} updated`)}
+      ${tile(s.codesLearned, `supplier ${word(s.codesLearned, "code")} learned`)}
+      ${tile(`≈ ${s.minutesSaved} min`, "of typing saved")}
+    </div>
+    <div class="result-detail">
+      <div class="how">${how.map(([n, label, tone]) => `<span class="pill ${tone}">${n} ${label}</span>`).join("")}</div>
+      ${s.priceUpdates.map((p) => `<div class="muted">${esc(p.name)}: ${money(p.from)} → ${money(p.to)}</div>`).join("")}
+      ${s.codesLearned ? `<div class="muted">The next invoice from ${esc(s.supplierName)} with these products will match by code, without AI.</div>` : ""}
+    </div>
+    <div class="result-foot">
+      <span class="hint">Time saved assumes about ${MANUAL_MINUTES_PER_COMPONENT} min to type a component by hand and ${MANUAL_MINUTES_PER_PRICE_UPDATE} min per price update.</span>
+      <button class="btn primary" data-go="upload">Import another invoice</button>
+    </div>
+  </section>`;
 }
 
 // ---------- Upload view ----------
@@ -182,6 +229,7 @@ async function process(fileName: string, blob: Blob) {
         decisions: initialDecisions(resolved.matches, catalog, markup),
         catalog, mine, markup, warnings,
         seconds: (performance.now() - started) / 1000,
+        reviewStartedAt: performance.now(),
         costUsd: usage.reduce((sum, u) => sum + (costUsd(extraction.model, u) ?? 0), 0),
       },
     });
@@ -386,6 +434,9 @@ function renderReview(s: Extract<State, { view: "review" }>) {
 
 app.addEventListener("click", async (e) => {
   const t = e.target as HTMLElement;
+  if (t.closest("[data-dismiss-result]") && state.view === "components") {
+    return setState({ ...state, result: undefined });
+  }
   const go = t.closest<HTMLElement>("[data-go]")?.dataset.go;
   if (go === "upload") return setState({ view: "upload" });
 
@@ -402,14 +453,14 @@ app.addEventListener("click", async (e) => {
     setState({ ...state, saving: true });
     try {
       await applyPlan(store, plan);
-      const bits = [
-        plan.add.length && `Added ${plural(plan.add.length, "component")}`,
-        plan.priceUpdates.length && `updated ${plural(plan.priceUpdates.length, "price")}`,
-        plan.aliases.length && `learned ${plural(plan.aliases.length, "supplier code")}`,
-      ].filter(Boolean).join(" · ");
       setState({
         view: "components",
-        flash: `${esc(bits)} from invoice ${esc(r.invoice.invoiceNumber)}.`,
+        result: {
+          summary: summarise(r.invoice, r.matches, r.decisions, plan),
+          processingSeconds: r.seconds,
+          reviewSeconds: (performance.now() - r.reviewStartedAt) / 1000,
+          costUsd: r.costUsd,
+        },
         freshIds: new Set([...plan.add.map((c) => c.id), ...plan.priceUpdates.map((p) => p.myComponentId)]),
       });
     } catch (err) {

@@ -5,7 +5,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { matchInvoice, withDuplicateCheck } from "../src/match.ts";
-import { applyPlan, choose, initialDecisions, planChanges, usualMarkup } from "../src/review.ts";
+import { applyPlan, choose, initialDecisions, planChanges, summarise, usualMarkup } from "../src/review.ts";
 import { JsonStore } from "../src/store.ts";
 import type { CatalogItem, ExtractedInvoice, LineMatch, MyComponent } from "../src/types.ts";
 
@@ -126,4 +126,24 @@ test("choosing 'create new' on an unclear line makes a record without a catalog 
   assert.equal(plan.add.length, 1);
   assert.equal(plan.add[0].catalogRef, null);
   assert.equal(plan.aliases.length, 0);
+});
+
+test("summary counts how each line was settled", async () => {
+  const { catalog, mine } = await fresh();
+  const { exp, invoice } = load("invoice-NRS-24817");
+  const markup = usualMarkup(mine);
+  const matches = matchWithSimulatedAI(exp, invoice, catalog, mine);
+  const decisions = initialDecisions(matches, catalog, markup);
+  const daikin = matches.findIndex((m) => m.line.description.startsWith("DAIKIN"));
+  decisions[daikin] = choose(decisions[daikin], matches[daikin], "cat-005", catalog, markup);
+  const tigo = matches.findIndex((m) => m.line.description.startsWith("TIGO"));
+  decisions[tigo] = { ...decisions[tigo], include: false };
+
+  const s = summarise(invoice, matches, decisions, planChanges(invoice, matches, decisions, catalog, mine));
+  // Ecodan (price), GivEnergy and Vaillant by rule; Telford and zappi by AI; Daikin by you; Sunsynk new; Tigo skipped.
+  assert.deepEqual(
+    [s.lines, s.added, s.priceUpdates.length, s.byRule, s.byAI, s.byYou, s.created, s.ignored, s.skipped],
+    [11, 6, 1, 3, 2, 1, 1, 3, 1],
+  );
+  assert.equal(s.minutesSaved, 6 * 3 + 1);
 });

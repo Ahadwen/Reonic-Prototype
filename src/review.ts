@@ -174,3 +174,52 @@ export async function applyPlan(store: Store, plan: Plan): Promise<void> {
   for (const p of plan.priceUpdates) await store.updatePrice(p.myComponentId, p.to);
   for (const a of plan.aliases) await store.addSupplierAlias(a.catalogId, a.alias);
 }
+
+// ---- What an import achieved, for the result card ----
+
+// Rough time to type one component in by hand (name, article no., prices, specs) and to update a price.
+// Assumptions for the estimate, shown next to it in the UI.
+export const MANUAL_MINUTES_PER_COMPONENT = 3;
+export const MANUAL_MINUTES_PER_PRICE_UPDATE = 1;
+
+export interface ImportSummary {
+  invoiceNumber: string;
+  supplierName: string;
+  lines: number;
+  added: number;
+  priceUpdates: PriceUpdate[];
+  codesLearned: number;
+  // How the lines that changed something were settled.
+  byRule: number;       // supplier code or article number, no AI
+  byAI: number;         // the AI picked from the shortlist
+  byYou: number;        // the installer chose between candidates
+  created: number;      // new products not in the catalog
+  ignored: number;      // consumables, delivery
+  skipped: number;      // lines the installer unticked
+  minutesSaved: number;
+}
+
+export function summarise(
+  invoice: Pick<ExtractedInvoice, "invoiceNumber" | "supplierName">,
+  matches: LineMatch[],
+  decisions: LineDecision[],
+  plan: Plan,
+): ImportSummary {
+  const s: ImportSummary = {
+    invoiceNumber: invoice.invoiceNumber, supplierName: invoice.supplierName, lines: matches.length,
+    added: plan.add.length, priceUpdates: plan.priceUpdates, codesLearned: plan.aliases.length,
+    byRule: 0, byAI: 0, byYou: 0, created: 0, ignored: 0, skipped: 0, minutesSaved: 0,
+  };
+  matches.forEach((m, i) => {
+    const d = decisions[i];
+    if (m.status === "ignored") { s.ignored++; return; }
+    if (m.status === "duplicate_no_change") return;
+    if (!d.include) { s.skipped++; return; }
+    if (m.status === "new" || (m.status === "needs_review" && d.choice === "new")) s.created++;
+    else if (m.status === "needs_review") s.byYou++;
+    else if (m.matchedBy === "ai") s.byAI++;
+    else s.byRule++;
+  });
+  s.minutesSaved = s.added * MANUAL_MINUTES_PER_COMPONENT + s.priceUpdates.length * MANUAL_MINUTES_PER_PRICE_UPDATE;
+  return s;
+}

@@ -1,0 +1,93 @@
+/* Screen C recreation. Deliberately self-contained and light-only, like the original. */
+
+#part2 { overflow-x: clip; --tabs-h: 43px; }
+
+#part2 { background: #fff; color: #111; min-height: 100vh; font-family: Inter, system-ui, sans-serif; }
+
+
+.offer-head { display: flex; align-items: center; gap: 14px; padding: 14px 40px; border-bottom: 1px solid #ececec; }
+.offer-logo svg { width: 64px; height: 40px; display: block; }
+.offer-title { font-weight: 700; font-size: 16px; }
+.offer-from { font-size: 14px; }
+
+.offer-body { display: grid; grid-template-columns: 300px 1fr; }
+.offer-nav { position: sticky; top: calc(var(--bar-h) + var(--tabs-h)); align-self: start; max-height: 100vh; overflow-y: auto; padding: 28px 20px 28px 26px; display: flex; flex-direction: column; gap: 4px; }
+.offer-nav button { background: none; border: 0; text-align: left; font: inherit; font-size: 14px; color: #111; padding: 6px 0 6px 2px; cursor: pointer; line-height: 1.45; }
+.offer-nav button.active { color: #f07d00; }
+.offer-nav button.active::before { content: "• "; }
+
+.offer-main { min-width: 0; }
+.offer-glance { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 1fr); gap: 32px; padding: 20px 20px 28px 16px; align-items: start; }
+.offer-text h1 { font-size: 38px; font-weight: 700; margin: 0 0 22px; letter-spacing: -0.01em; }
+.offer-text p { font-size: 16px; line-height: 1.55; margin: 0 0 26px; }
+.offer-text h3 { color: #f07d00; font-size: 30px; font-weight: 500; margin: 0 0 14px; }
+.offer-checks { list-style: none; padding: 0; margin: 0 0 18px; }
+.offer-checks li { display: flex; gap: 14px; align-items: center; font-size: 17px; line-height: 1.6; margin-bottom: 22px; }
+.offer-checks svg { width: 34px; height: 34px; flex: none; }
+.offer-total { display: flex; justify-content: space-between; background: #f5f5f6; border-top: 2px solid #e2e2e4; padding: 12px 16px; font-weight: 600; font-size: 16px; }
+.offer-art { padding-top: 60px; }
+.offer-house { width: 100%; max-width: 720px; height: auto; display: block; font-family: Inter, system-ui, sans-serif; }
+
+.offer-pdf { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #f2f3f5; padding: 22px 300px 22px 16px; }
+.offer-pdf b { display: block; font-size: 16px; }
+.offer-pdf small { font-size: 12px; }
+.offer-pdf-btn { display: inline-flex; gap: 6px; align-items: center; background: #fff; border: 1.5px solid #1f3d4f; color: #1f3d4f; border-radius: 6px; padding: 6px 10px; font: inherit; font-size: 15px; cursor: pointer; white-space: nowrap; }
+.offer-pdf-btn svg { width: 15px; height: 15px; }
+
+.offer-end { border-top: 2px dashed #c4c4c8; margin: 48px 16px 0; padding: 10px 0 48px; text-align: center; }
+.offer-end span { color: #9a9a9a; font-size: 13px; }
+
+/* Always laid out as on a 1440px desktop; part2.ts zooms it out to fit narrower screens. */
+.offer { min-width: 1440px; }
+
+/* ---- Tabs: provided vs updated (outside the zoomed screen) ---- */
+.offer-tabs { position: sticky; top: var(--bar-h); z-index: 10; height: var(--tabs-h); box-sizing: border-box; display: flex; gap: 4px; padding: 8px 16px 0; background: #f4f2ff; border-bottom: 1px solid #ddd6ff; font-family: Inter, system-ui, sans-serif; }
+.offer-tabs a { padding: 8px 14px; font-size: 14px; font-weight: 500; color: #4c4766; text-decoration: none; border-radius: 8px 8px 0 0; border: 1px solid transparent; margin-bottom: -1px; }
+.offer-tabs a:hover { color: #4c2fd6; }
+.offer-tabs a.active { background: #fff; color: #4c2fd6; border-color: #ddd6ff; border-bottom-color: #fff; }
+
+/* ---- Updated screen ---- */
+.lang-switch { margin-left: auto; display: flex; border: 1px solid #d9d9de; border-radius: 8px; overflow: hidden; }
+.lang-switch button { background: #fff; border: 0; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; color: #444; }
+.lang-switch button + button { border-left: 1px solid #d9d9de; }
+.lang-switch button.active { background: #1f3d4f; color: #fff; }
+
+.offer-nav.grouped { gap: 2px; }
+.nav-group-head { display: flex !important; align-items: center; gap: 8px; width: 100%; font-weight: 600 !important; color: #111 !important; }
+.nav-group-head::before { content: none !important; }
+.nav-group-head svg { width: 14px; height: 14px; flex: none; transition: transform 0.15s; color: #888; }
+.nav-group.open .nav-group-head svg { transform: rotate(90deg); }
+.nav-count { margin-left: auto; font-size: 12px; font-weight: 500; color: #999; background: #f2f2f4; border-radius: 999px; padding: 0 7px; }
+.nav-items { display: none; flex-direction: column; padding: 0 0 6px 22px; }
+.nav-group.open .nav-items { display: flex; }
+.nav-items button { padding: 4px 0 !important; font-size: 13.5px !important; }
+
+.offer.updated .offer-art { position: sticky; top: calc(var(--bar-h) + var(--tabs-h) + 16px); }
+.house-hint { text-align: center; color: #8a8a8a; font-size: 13px; margin: 8px 0 0; }
+
+/* Linked highlight between picture, ticks and costs */
+.offer.updated [data-item] { transition: background-color 0.15s, color 0.15s, box-shadow 0.15s; cursor: pointer; }
+.offer.updated .hot { outline: none; }
+.offer.updated .hot .pill-bg { transition: fill 0.15s; }
+.offer.updated .hot.lit .pill-bg { fill: #f07d00; }
+.offer.updated .hot.lit .part { filter: drop-shadow(0 0 6px #f07d00) drop-shadow(0 0 2px #f07d00); }
+.offer.updated .offer-checks li { border-radius: 10px; padding: 4px 8px; margin-left: -8px; }
+.offer.updated .offer-checks li.lit { background: #fff3e4; }
+
+.invest { margin-top: 8px; }
+.invest-title { margin-bottom: 10px !important; }
+.cost-row { border-left: 3px solid transparent; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 16px; border-bottom: 1px solid #ececee; font-size: 16px; }
+.cost-row > span:last-child { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+.cost-row b { display: block; font-weight: 600; }
+.cost-row small { display: block; color: #6b6b6b; font-size: 13px; margin-top: 2px; }
+.cost-row.lit { background: #fff3e4; border-left-color: #f07d00; }
+.cost-row.subtotal { color: #555; }
+.cost-row.subtotal > span:last-child { font-weight: 500; }
+.cost-row.grant > span:last-child { color: #1b7a3c; }
+.cost-row.price { background: #f5f5f6; border-top: 2px solid #e2e2e4; border-bottom: 0; font-weight: 700; font-size: 20px; }
+.cost-row.price > span:last-child { font-weight: 700; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.stats > div { background: #f2f6f8; border-radius: 10px; padding: 12px 14px; }
+.stats b { display: block; font-size: 22px; color: #1f3d4f; }
+.stats span { font-size: 13px; color: #555; line-height: 1.35; display: block; margin-top: 2px; }
+.estimates { font-size: 12px !important; color: #8a8a8a; margin: 10px 0 0 !important; }

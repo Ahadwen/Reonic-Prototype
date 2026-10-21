@@ -1,11 +1,11 @@
 // Entry point: one site for both parts of the case study.
 //   #             home, with a card per part; clicking a card opens its write-up
 //   #components   Part 1, the components list    (#import: the invoice import flow)
-//   #offer        Part 2, Screen C (the digital offer)
+//   #offer        Part 2, Screen C as provided   (#offer/updated: the updated screen)
 // A case-study bar runs across the top of both parts, so they read as two sections of one piece of work.
 
 import { showPart1 } from "./part1.ts";
-import { showPart2 } from "./part2.ts";
+import { showPart2 } from "./part2/index.ts";
 
 const bar = document.getElementById("case-bar")!;
 const home = document.getElementById("home")!;
@@ -133,13 +133,14 @@ function renderBar(current: PartId) {
 
 function route() {
   const hash = location.hash;
-  const current: PartId | null = hash === "#components" || hash === "#import" ? "part1" : hash === "#offer" ? "part2" : null;
+  const current: PartId | null = hash === "#components" || hash === "#import" ? "part1"
+    : hash === "#offer" || hash === "#offer/updated" ? "part2" : null;
   const page = current === "part1" ? part1 : current === "part2" ? part2 : home;
   for (const el of [home, part1, part2]) el.hidden = el !== page;
   bar.hidden = !current;
   if (current) renderBar(current);
   if (current === "part1") showPart1(hash);
-  else if (current === "part2") showPart2();
+  else if (current === "part2") showPart2(hash);
   else renderHome();
   window.scrollTo(0, 0);
 }

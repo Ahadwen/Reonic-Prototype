@@ -3,7 +3,7 @@
 One site for both parts of the case study. The home page (`#`) has a card per part; clicking one opens a write-up with a link to the prototype. A purple case-study bar runs across the top of both parts.
 
 - **Part 1 · Product thinking** (`#components`, `#import`): invoice → components, described below.
-- **Part 2 · Product taste** (`#offer`): Screen C, the digital offer, recreated from the brief as the starting point for the critique and redesign.
+- **Part 2 · Product taste** (`#offer`, `#offer/updated`): Screen C, the digital offer, as provided in the brief and updated, switchable with tabs.
 
 ## Part 1: Invoice → Components
 
@@ -80,7 +80,7 @@ Never commit an API key. The site asks for one at runtime instead.
 | `src/cost.ts` | Token → USD estimate |
 | `src/main.ts` | Router and case-study home page |
 | `src/part1.ts`, `index.html`, `src/style.css` | Part 1 UI: components list, and the upload → processing → review → confirm flow |
-| `src/part2.ts`, `src/part2.css` | Part 2: Screen C (the digital offer) recreated from the brief |
+| `src/part2/` | Part 2: Screen C. `original.ts` recreates it as given in the brief; `updated.ts` is the redesign (grouped expandable nav, price breakdown with grant and savings, house illustration linked to the costs, English/German); `art.ts` holds the shared artwork; `index.ts` switches between them with tabs (`#offer`, `#offer/updated`). |
 | `scripts/eval-extraction.ts` | Extraction accuracy against `public/samples/*.expected.json` |
 | `scripts/eval-matching.ts` | Matching accuracy against the same files |
 | `scripts/test-review.ts` | Tests for the review step (`npm test`), with the AI step simulated from the expected results |

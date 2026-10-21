@@ -91,7 +91,7 @@ const COPY = {
       { title: "Your system", open: true, items: ["Solar system", "Solar components", "Electricity yield", "Energy storage", "Heat pump", "All components"] },
       { title: "Your home", open: false, items: ["Building", "Your household", "Your heat balance"] },
       { title: "Costs and savings", open: false, items: ["Economic efficiency", "Future tariff overview"] },
-      { title: "Next steps", open: false, items: ["Accept offer"], target: "next" },
+      { title: "Next steps", open: false, items: ["Accept offer"], target: "cta" },
       { title: "Documents", open: false, items: ["Datasheets", "MCS heat pump performance estimate", "MCS sound check results", "MCS key information", "MCS PV performance estimate", "Heat loss survey and radiator changes", "MCS proposed heat pump", "MCS shading and sun path diagram"] },
     ] as NavGroup[],
     langName: "English",
@@ -159,7 +159,7 @@ const COPY = {
       { title: "Ihre Anlage", open: true, items: ["Solaranlage", "Solarkomponenten", "Stromertrag", "Energiespeicher", "Wärmepumpe", "Alle Komponenten"] },
       { title: "Ihr Zuhause", open: false, items: ["Gebäude", "Ihr Haushalt", "Ihre Wärmebilanz"] },
       { title: "Kosten und Ersparnis", open: false, items: ["Wirtschaftlichkeit", "Zukünftige Tarife"] },
-      { title: "Nächste Schritte", open: false, items: ["Angebot annehmen"], target: "next" },
+      { title: "Nächste Schritte", open: false, items: ["Angebot annehmen"], target: "cta" },
       { title: "Dokumente", open: false, items: ["Datenblätter", "MCS-Leistungsprognose Wärmepumpe", "MCS-Schallprüfung", "MCS-Kerninformationen", "MCS-Leistungsprognose PV", "Wärmeverlust und Heizkörpertausch", "MCS-Wärmepumpenvorschlag", "MCS-Verschattungsdiagramm"] },
     ] as NavGroup[],
     langName: "Deutsch",
@@ -182,7 +182,9 @@ let signature = "";   // data URL of the signature, shown once accepted
 
 const tick = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-function renderNextSteps(t: (typeof COPY)[Lang]) {
+// The call to action lives in the side column, under the nav, so it stays in view whichever
+// section of the offer the customer opens.
+function renderCta(t: (typeof COPY)[Lang], price: string) {
   const date = (d: Date) => new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long" }).format(d);
   // The survey is behind them; the offer is current until they open the signature box, then signing is.
   const current = phase === "accepted" ? 3 : phase === "signing" ? 2 : 1;
@@ -193,36 +195,41 @@ function renderNextSteps(t: (typeof COPY)[Lang]) {
       : phase === "accepted" && i === 3 ? t.installNext
       : t.stepNotes[i];
     return `<li class="${state}"><span class="step-dot">${state === "done" ? tick : i + 1}</span>
-      <div><b>${label}</b><small>${note}</small></div></li>`;
+      <div><b>${label}</b>${note ? `<small>${note}</small>` : ""}</div></li>`;
   }).join("");
   const validUntil = new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long", year: "numeric" }).format(VALID_UNTIL);
 
-  const body = {
-    offer: `<div class="cta-row">
-        <button class="cta" data-cta="sign">${t.accept} →</button>
-        ${emailed ? `<p class="later-sent">${t.laterSent}</p>` : `<button class="cta-secondary" data-cta="later">${t.later}</button>`}
-      </div>`,
-    signing: `<div class="sign">
-        <b>${t.signTitle}</b>
-        <canvas class="sign-pad" width="760" height="180" aria-label="${t.signHint}"></canvas>
-        <div class="sign-row">
-          <span class="hint">${t.signHint}</span>
-          <button class="link-btn" data-cta="clear">${t.signClear}</button>
-          <button class="cta-secondary" data-cta="cancel">${t.cancel}</button>
-          <button class="cta" data-cta="confirm" disabled>${t.signConfirm}</button>
-        </div>
-      </div>`,
-    accepted: `<div class="accepted"><span class="step-dot done">${tick}</span>
-        <div><b>${t.accepted}</b><p>${t.acceptedNote}</p>${signature ? `<img class="signed" src="${signature}" alt="" />` : ""}</div>
-        <button class="link-btn" data-cta="undo">${t.undo}</button></div>`,
-  }[phase];
+  const actions = phase === "accepted"
+    ? `<div class="accepted"><b>${t.accepted}</b><p>${t.acceptedNote}</p>${signature ? `<img class="signed" src="${signature}" alt="" />` : ""}
+        <button class="link-btn" data-cta="undo">${t.undo}</button></div>`
+    : `<button class="cta" data-cta="sign">${t.accept} →</button>
+       ${emailed ? `<p class="later-sent">${t.laterSent}</p>` : `<button class="cta-secondary" data-cta="later">${t.later}</button>`}`;
 
-  return `<section class="next" id="next">
-    <h3>${t.nextTitle}</h3>
+  return `<section class="cta-panel" id="cta">
+    <div class="cta-price"><span>${t.yourPrice}</span><b>${price}</b></div>
     <ol class="offer-steps">${steps}</ol>
-    ${body}
+    ${actions}
     <p class="validity">${t.validity(validUntil)}</p>
   </section>`;
+}
+
+// Signing opens over the page at full size, as it would when the tablet is handed to the customer.
+function renderSignModal(t: (typeof COPY)[Lang]) {
+  if (phase !== "signing") return "";
+  return `<div class="sign-modal" role="dialog" aria-modal="true" aria-labelledby="sign-title">
+    <div class="sign">
+      <b id="sign-title">${t.signTitle}</b>
+      <canvas class="sign-pad" width="760" height="220" aria-label="${t.signHint}"></canvas>
+      <div class="sign-row">
+        <span class="hint">${t.signHint}</span>
+        <button class="link-btn" data-cta="clear">${t.signClear}</button>
+      </div>
+      <div class="sign-row end">
+        <button class="cta-secondary" data-cta="cancel">${t.cancel}</button>
+        <button class="cta" data-cta="confirm" disabled>${t.signConfirm}</button>
+      </div>
+    </div>
+  </div>`;
 }
 
 // Draw-to-sign on the canvas; enables the confirm button once there's ink.
@@ -285,7 +292,10 @@ export function renderUpdated(lang: Lang): string {
         </div>
       </header>
       <div class="offer-body">
-        <nav class="offer-nav grouped">${nav}</nav>
+        <aside class="offer-side">
+          <nav class="offer-nav grouped">${nav}</nav>
+          ${renderCta(t, money(total - GRANT, t.locale, 2))}
+        </aside>
         <div class="offer-main">
           <section class="offer-glance">
             <div class="offer-text">
@@ -306,7 +316,6 @@ export function renderUpdated(lang: Lang): string {
                 <div class="stats">${t.stats.map(([n, l]) => `<div><b>${n}</b><span>${l}</span></div>`).join("")}</div>
                 <p class="estimates">${t.estimates}</p>
               </section>
-              ${renderNextSteps(t)}
             </div>
             <div class="offer-art">
               ${house(t.labels, true, t.houseAria)}
@@ -320,7 +329,8 @@ export function renderUpdated(lang: Lang): string {
           <div class="offer-end"><span>${t.end}</span></div>
         </div>
       </div>
-    </div>`;
+    </div>
+    ${renderSignModal(t)}`;
 }
 
 // Interaction for the updated screen. Returns nothing; wires listeners on `root`.
@@ -346,6 +356,19 @@ export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
   offer.addEventListener("focusin", (e) => { const i = itemOf(e); if (i) light(i); });
   offer.addEventListener("focusout", () => light(pinned));
 
+  // Call-to-action buttons, in the side panel and in the signing overlay (which sits outside .offer).
+  const onCta = (e: Event) => {
+    const cta = (e.target as HTMLElement).closest<HTMLElement>("[data-cta]")?.dataset.cta;
+    if (!cta || cta === "clear") return false;
+    if (cta === "sign") phase = "signing";
+    if (cta === "cancel") phase = "offer";
+    if (cta === "confirm") phase = "accepted";
+    if (cta === "undo") { phase = "offer"; signature = ""; }
+    if (cta === "later") emailed = true;
+    rerender(currentLang);
+    return true;
+  };
+  root.querySelector(".sign-modal")?.addEventListener("click", (e) => onCta(e));
   offer.addEventListener("click", (e) => {
     const t = e.target as HTMLElement;
     // Tap to pin on touch screens (no hover); tap again to clear.
@@ -365,23 +388,15 @@ export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
     const lang = t.closest<HTMLElement>("[data-lang]")?.dataset.lang as Lang | undefined;
     if (lang) return rerender(lang);
 
-    const cta = t.closest<HTMLElement>("[data-cta]")?.dataset.cta;
-    if (cta && cta !== "clear") {
-      if (cta === "sign") phase = "signing";
-      if (cta === "cancel") phase = "offer";
-      if (cta === "confirm") phase = "accepted";
-      if (cta === "undo") { phase = "offer"; signature = ""; }
-      if (cta === "later") emailed = true;
-      rerender(currentLang);
-      root.querySelector("#next")?.scrollIntoView({ block: "nearest" });
-      return;
-    }
+    if (onCta(e)) return;
 
     const navItem = t.closest<HTMLElement>(".nav-items button");
     if (navItem) {
       offer.querySelectorAll(".nav-items button.active").forEach((b) => b.classList.remove("active"));
       navItem.classList.add("active");
-      if (navItem.dataset.target) root.querySelector(`#${navItem.dataset.target}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      // "Accept offer" points at the panel that's already on screen.
+      const target = navItem.dataset.target ? root.querySelector<HTMLElement>(`#${navItem.dataset.target}`) : null;
+      if (target) { target.classList.remove("flash"); void target.offsetWidth; target.classList.add("flash"); }
     }
   });
   offer.addEventListener("keydown", (e) => {

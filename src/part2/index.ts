@@ -15,6 +15,8 @@ function fitToWidth() {
   if (!offer) return;
   const scale = Math.min(1, root.clientWidth / DESIGN_WIDTH);
   offer.style.zoom = scale < 1 ? String(scale) : "";
+  // Sticky offsets inside the screen divide by this, since lengths there are scaled by the zoom.
+  offer.style.setProperty("--zoom", String(scale));
 }
 window.addEventListener("resize", fitToWidth);
 

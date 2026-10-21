@@ -37,6 +37,14 @@ const PARTS: Record<PartId, { label: string; title: string; teaser: string; href
         <li><b>Learn.</b> Confirming teaches the catalog that supplier's codes, so the next invoice from them matches by rule.</li>
       </ol>
 
+      <h3>How the AI is integrated</h3>
+      <ul>
+        <li><b>Two narrow jobs, not a chatbot.</b> One call reads the invoice into structured data. A second call runs only for lines the rules couldn't settle, and only picks from a shortlist.</li>
+        <li><b>Guardrails.</b> Line totals are checked against the invoice total. The AI can't invent a catalog match, and can answer "unsure" so a person decides. Nothing is saved until the installer confirms.</li>
+        <li><b>Measured, not assumed.</b> An evaluation scores reading and matching against known answers on every change.</li>
+        <li><b>Gets cheaper with use.</b> Confirmed supplier codes are remembered, so repeat purchases match by rule without the AI.</li>
+      </ul>
+
       <h3>Why it fits Reonic</h3>
       <ul>
         <li>It uses something installers already have and already handle, so there's no new habit to learn.</li>
@@ -51,6 +59,26 @@ const PARTS: Record<PartId, { label: string; title: string; teaser: string; href
         <li>An invoice takes about 12 seconds, at about $0.03 in AI costs.</li>
         <li>Importing the same invoice a second time matches everything by code, so only the reading step uses AI.</li>
       </ul>
+
+      <h3>Evidence to gather first</h3>
+      <ul>
+        <li><b>Do invoices list several components, or are parts bought one at a time?</b> Ask installers for 10–20 recent invoices and count component lines per invoice, suppliers, and "system pack" lines that hide several parts. Ask how they buy: stocking up from a wholesaler, per project, or direct from manufacturers, and whether it differs by market. If most invoices hold one item, the value shifts to keeping the database current and to a single-product photo mode.</li>
+        <li><b>How painful is setup today?</b> Customer Success: how long setups take, how many sessions, where installers get stuck. Product data: time to the first 20 components, and accounts that stall at setup.</li>
+        <li><b>Do installers have the invoices to hand?</b> 5–8 installer interviews across DACH, UK and Italy: PDFs, paper, wholesaler portals?</li>
+        <li><b>Does it work on real invoices?</b> Run the pipeline offline on 50–100 real invoices per market and measure reading and matching accuracy. This is the biggest risk.</li>
+        <li><b>Is the review trusted?</b> Usability sessions with a few installers: do they trust the matches, and is reviewing faster than typing?</li>
+      </ul>
+
+      <h3>Measuring success</h3>
+      <ul>
+        <li><b>Main measure:</b> time from account creation to a usable database (for example the first 20 components).</li>
+        <li><b>Adoption:</b> share of new accounts that import at least one invoice, and invoices imported per account.</li>
+        <li><b>Quality:</b> share of lines confirmed without edits, and how often an imported component is corrected later.</li>
+        <li><b>Lasting use:</b> imports after onboarding, and price changes picked up from them.</li>
+        <li><b>For Reonic:</b> fewer Customer Success hours spent on setup, and verified supplier codes added to the central catalog.</li>
+        <li><b>Guardrail:</b> no rise in support tickets or wrong prices in offers caused by imported components.</li>
+      </ul>
+      <p>The result card after each import already shows early versions of these: time taken, lines settled by rule, by AI or by the installer, and supplier codes learned.</p>
 
       <h3>What's simulated</h3>
       <p>The 43-item catalog stands in for Reonic's central database, and the supplier and invoices are invented. Changes are saved in your browser; "Reset demo data" in the sidebar starts over.</p>`,

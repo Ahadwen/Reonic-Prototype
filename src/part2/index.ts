@@ -5,13 +5,14 @@
 import "./part2.css";
 import { renderChanges } from "./changes.ts";
 import { renderOriginal } from "./original.ts";
-import { renderPost, wirePost } from "./post.ts";
+import { openWelcome, renderPost, wirePost } from "./post.ts";
 import { renderUpdated, wireUpdated, type Lang } from "./updated.ts";
 
 const POST_NOTE = "Keeping to three tangible changes left the page very close to the original, and I wasn’t satisfied with that. It stayed on my mind after the submission date, so I continued exploring the design in a separate tab from the previously submitted work.";
 
 const root = document.getElementById("part2")!;
 let lang: Lang = "en";
+let lastHash = "";
 
 // The screen is shown as it looks on a desktop, scaled down on smaller screens rather than reflowed.
 const DESIGN_WIDTH = 1440;
@@ -29,6 +30,9 @@ export function showPart2(hash: string) {
   const updated = hash === "#offer/updated";
   const changes = hash === "#offer/changes";
   const post = hash === "#offer/post";
+  // Arriving on the post-submission tab (not re-rendering it) opens its welcome card.
+  if (post && lastHash !== hash) openWelcome();
+  lastHash = hash;
   const tab = (href: string, label: string, active: boolean) =>
     `<a href="${href}" class="${active ? "active" : ""}" ${active ? `aria-current="page"` : ""}>${label}</a>`;
 

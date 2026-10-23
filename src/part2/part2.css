@@ -189,7 +189,6 @@
 .slide { min-height: max(480px, calc((100vh - var(--bar-h) - var(--tabs-h)) / var(--zoom, 1) - var(--offer-head-h) - 160px)); border: 1px solid #e6e6e9; border-radius: 18px; padding: 36px 40px; background: #fff; box-shadow: 0 8px 30px rgba(31, 61, 79, 0.06); outline: none; }
 .slide h1 { font-size: 36px; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
 .slide p { font-size: 17px; line-height: 1.6; margin: 0 0 18px; max-width: 760px; }
-.slide h1.greeting { margin-bottom: 22px; }
 .slide-lead { color: #555; }
 .summary-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px 0 0; }
 .summary-list div { background: #f2f6f8; border-radius: 12px; padding: 14px 16px; }
@@ -256,3 +255,21 @@
 .doc-actions .hint { color: #888; font-size: 13px; }
 .offer.post .nav-group-head.current span:not(.nav-count) { color: #c45f00; }
 .offer.post .nav-group.apart { border-top: 1px solid #e2e2e6; margin-top: 14px; padding-top: 14px; }
+
+/* Welcome card: opens over the offer on arrival (outside the zoomed screen, so full size anywhere) */
+.welcome-modal { position: fixed; inset: 0; z-index: 40; background: rgba(15, 23, 30, 0.5); display: grid; place-items: center; padding: 16px; font-family: Inter, system-ui, sans-serif; color: #111; animation: fade-in 0.2s ease-out; }
+@keyframes fade-in { from { opacity: 0; } }
+.welcome { background: #fff; border-radius: 20px; padding: 28px 36px 32px; width: min(760px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3); animation: card-in 0.25s ease-out; }
+.welcome-top { display: flex; align-items: center; gap: 12px; padding-bottom: 18px; margin-bottom: 22px; border-bottom: 1px solid #ececef; }
+.welcome-top .offer-logo svg { width: 52px; height: 32px; display: block; }
+.welcome-top .lang-switch { margin-left: auto; }
+.welcome h1 { font-size: 32px; margin: 0 0 16px; letter-spacing: -0.01em; }
+.welcome p { font-size: 17px; line-height: 1.6; margin: 0 0 14px; }
+.welcome .summary-list { margin: 22px 0 26px; }
+.welcome-go { font-size: 17px; padding: 14px 28px; }
+@media (max-width: 600px) {
+  .welcome { padding: 20px; }
+  .welcome h1 { font-size: 26px; }
+  .welcome .summary-list { grid-template-columns: 1fr; }
+  .welcome-top { flex-wrap: wrap; }
+}

@@ -21,7 +21,8 @@ const HOME_CARDS: CardId[] = ["building", "household", "heat"];
 
 const POST = {
   en: {
-    slides: ["Welcome", "At a glance", "Costs and savings", "Your system", "Your home"],
+    slides: ["At a glance", "Costs and savings", "Your system", "Your home"],
+    welcomeCta: "View your offer",
     summary: (price: string, valid: string) => [
       ["Includes", "Solar system · Battery storage · Heat pump"],
       ["Your price", `${price} after the grant`],
@@ -35,7 +36,7 @@ const POST = {
     backTo: (s: string) => `Back to ${s}`,
     open: "Open",
     of: (i: number, n: number) => `${i} of ${n}`,
-    overview: ["Welcome", "At a glance"],
+    overview: ["At a glance"],
     docsLink: (n: number) => `See your documents (${n})`,
     docsTitle: "Your documents",
     docsLead: "Datasheets, the MCS paperwork and the survey results. Open one to see what's in it.",
@@ -85,7 +86,8 @@ const POST = {
     } as Record<CardId, Omit<Card, "id">>,
   },
   de: {
-    slides: ["Willkommen", "Auf einen Blick", "Kosten und Ersparnis", "Ihre Anlage", "Ihr Zuhause"],
+    slides: ["Auf einen Blick", "Kosten und Ersparnis", "Ihre Anlage", "Ihr Zuhause"],
+    welcomeCta: "Zum Angebot",
     summary: (price: string, valid: string) => [
       ["Enthält", "Solaranlage · Batteriespeicher · Wärmepumpe"],
       ["Ihr Preis", `${price} nach Förderung`],
@@ -99,7 +101,7 @@ const POST = {
     backTo: (s: string) => `Zurück zu ${s}`,
     open: "Öffnen",
     of: (i: number, n: number) => `${i} von ${n}`,
-    overview: ["Willkommen", "Auf einen Blick"],
+    overview: ["Auf einen Blick"],
     docsLink: (n: number) => `Ihre Dokumente ansehen (${n})`,
     docsTitle: "Ihre Dokumente",
     docsLead: "Datenblätter, die MCS-Unterlagen und die Ergebnisse des Vor-Ort-Termins. Öffnen Sie ein Dokument, um den Inhalt zu sehen.",
@@ -165,17 +167,17 @@ function navGroups(lang: Lang): { group: NavGroup; targets: Target[] }[] {
   const base = COPY[lang].nav;
   return [
     // Same order as the slides: welcome and at a glance, costs, your system, your home.
-    { group: { ...base[0], items: POST[lang].overview }, targets: [{ slide: 0 }, { slide: 1 }] },
-    { group: base[3], targets: base[3].items.map(() => ({ slide: 2 })) },
-    { group: base[1], targets: SYSTEM_CARDS.map((card) => ({ slide: 3, card })) },
-    { group: base[2], targets: HOME_CARDS.map((card) => ({ slide: 4, card })) },
+    { group: { ...base[0], items: POST[lang].overview }, targets: [{ slide: 0 }] },
+    { group: base[3], targets: base[3].items.map(() => ({ slide: 1 })) },
+    { group: base[1], targets: SYSTEM_CARDS.map((card) => ({ slide: 2, card })) },
+    { group: base[2], targets: HOME_CARDS.map((card) => ({ slide: 3, card })) },
     { group: base[5], targets: base[5].items.map((_, doc) => ({ doc })) },
   ];
 }
 
 // Each nav group heading leads to the root of its area, in the same order as navGroups().
 type Area = { slide: number } | "docs";
-const AREAS: Area[] = [{ slide: 0 }, { slide: 2 }, { slide: 3 }, { slide: 4 }, "docs"];
+const AREAS: Area[] = [{ slide: 0 }, { slide: 1 }, { slide: 2 }, { slide: 3 }, "docs"];
 const atArea = (a: Area) => a === "docs" ? docsOpen && openDoc === null : !docsOpen && slide === a.slide && openCard === null;
 
 const isCurrent = (t: Target) => {
@@ -253,15 +255,10 @@ function renderSlide(lang: Lang) {
   const p = POST[lang];
   const total = COSTS.reduce((s, c) => s + c.amount, 0);
   const price = money(total - GRANT, t.locale, 2);
-  const valid = new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long", year: "numeric" }).format(VALID_UNTIL);
   const amount = (item: Item) => money(COSTS.find((c) => c.item === item)!.amount, t.locale);
 
   switch (slide) {
     case 0: return `
-      <h1 class="greeting">${t.greeting}</h1>
-      ${t.intro.map((x) => `<p>${x}</p>`).join("")}
-      <dl class="summary-list">${p.summary(price, valid).map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>`;
-    case 1: return `
       <h1>${t.glance}</h1>
       <div class="glance-grid">
         <ul class="offer-checks">
@@ -269,8 +266,8 @@ function renderSlide(lang: Lang) {
         </ul>
         <div class="glance-art">${house(t.labels, true, t.houseAria)}<p class="house-hint">${t.houseHint}</p></div>
       </div>`;
-    case 2: return `
-      <h1>${p.slides[2]}</h1>
+    case 1: return `
+      <h1>${p.slides[1]}</h1>
       <p class="slide-lead">${p.costsLead}</p>
       <div class="costs-grid">
         <div>
@@ -285,13 +282,39 @@ function renderSlide(lang: Lang) {
         <div class="stats stacked">${t.stats.map(([n, l]) => `<div><b>${n}</b><span>${l}</span></div>`).join("")}<p class="estimates">${t.estimates}</p></div>
       </div>`;
     // An open card takes over the whole slide; its back link names the section it returns to.
-    case 3: return openCard && SYSTEM_CARDS.includes(openCard)
-      ? renderCards(lang, SYSTEM_CARDS, p.slides[3])
-      : `<h1>${p.slides[3]}</h1><p class="slide-lead">${p.systemLead}</p>${renderCards(lang, SYSTEM_CARDS, p.slides[3])}`;
+    case 2: return openCard && SYSTEM_CARDS.includes(openCard)
+      ? renderCards(lang, SYSTEM_CARDS, p.slides[2])
+      : `<h1>${p.slides[2]}</h1><p class="slide-lead">${p.systemLead}</p>${renderCards(lang, SYSTEM_CARDS, p.slides[2])}`;
     default: return openCard && HOME_CARDS.includes(openCard)
-      ? renderCards(lang, HOME_CARDS, p.slides[4])
-      : `<h1>${p.slides[4]}</h1><p class="slide-lead">${p.homeLead}</p>${renderCards(lang, HOME_CARDS, p.slides[4])}`;
+      ? renderCards(lang, HOME_CARDS, p.slides[3])
+      : `<h1>${p.slides[3]}</h1><p class="slide-lead">${p.homeLead}</p>${renderCards(lang, HOME_CARDS, p.slides[3])}`;
   }
+}
+
+// The greeting and summary open over the offer when the customer arrives, instead of being a slide.
+let welcomeOpen = true;
+export function openWelcome() { welcomeOpen = true; }
+
+function renderWelcome(lang: Lang) {
+  const t = COPY[lang];
+  const p = POST[lang];
+  const price = money(COSTS.reduce((s, c) => s + c.amount, 0) - GRANT, t.locale, 2);
+  const valid = new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long", year: "numeric" }).format(VALID_UNTIL);
+  return `<div class="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-title" lang="${lang}">
+    <div class="welcome">
+      <div class="welcome-top">
+        <div class="offer-logo">${logo}</div>
+        <div><div class="offer-title">${t.offerTitle}</div><div class="offer-from">${t.from}</div></div>
+        <div class="lang-switch" role="group" aria-label="Language">
+          ${(["en", "de"] as Lang[]).map((l) => `<button data-welcome-lang="${l}" class="${l === lang ? "active" : ""}" aria-pressed="${l === lang}">${COPY[l].langName}</button>`).join("")}
+        </div>
+      </div>
+      <h1 id="welcome-title">${t.greeting}</h1>
+      ${t.intro.map((x) => `<p>${x}</p>`).join("")}
+      <dl class="summary-list">${p.summary(price, valid).map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
+      <button class="cta welcome-go" data-welcome-close>${p.welcomeCta} →</button>
+    </div>
+  </div>`;
 }
 
 export function renderPost(lang: Lang): string {
@@ -330,7 +353,8 @@ export function renderPost(lang: Lang): string {
           `<button class="docs-link ${docsOpen ? "active" : ""}" data-open-docs>${p.docsLink(p.docs.length)} →</button>`)}</aside>
       </div>
     </div>
-    ${renderSignModal(t)}`;
+    ${renderSignModal(t)}
+    ${welcomeOpen ? renderWelcome(lang) : ""}`;
 }
 
 export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
@@ -338,6 +362,17 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
   if (!offer) return;
   const lang = (offer.getAttribute("lang") ?? "en") as Lang;
   const shared = wireShared(root, offer, rerender);
+
+  // Welcome card: close with its button, a click outside it or Escape; it has its own language switch.
+  const welcome = root.querySelector<HTMLElement>(".welcome-modal");
+  const closeWelcome = () => { welcomeOpen = false; rerender(lang); };
+  welcome?.addEventListener("click", (e) => {
+    const t = e.target as HTMLElement;
+    const l = t.closest<HTMLElement>("[data-welcome-lang]")?.dataset.welcomeLang as Lang | undefined;
+    if (l) return rerender(l);
+    if (t === welcome || t.closest("[data-welcome-close]")) closeWelcome();
+  });
+  welcome?.querySelector<HTMLElement>("[data-welcome-close]")?.focus({ preventScroll: true });
   const n = POST[lang].slides.length;
 
   const go = (to: number, card: CardId | null = null) => {
@@ -403,6 +438,7 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
   const onKey = (e: KeyboardEvent) => {
     if (!document.contains(offer) || root.hidden) return document.removeEventListener("keydown", onKey);
     const tag = (e.target as HTMLElement).tagName;
+    if (root.querySelector(".welcome-modal")) { if (e.key === "Escape") closeWelcome(); return; }
     if (tag === "INPUT" || tag === "TEXTAREA" || root.querySelector(".sign-modal")) return;
     if (docsOpen) return;
     if (e.key === "ArrowRight") go((slide + 1) % n);

@@ -320,7 +320,7 @@ export function renderPost(lang: Lang): string {
               ? `<button class="deck-btn" data-back-offer>← ${p.backToOffer}: ${p.slides[slide]}</button>`
               : `<button class="deck-btn" data-step="-1" ${slide === 0 ? "disabled" : ""}>← ${p.back}</button>
                  <span class="deck-count">${p.of(slide + 1, n)}</span>
-                 <button class="deck-btn primary" data-step="1" ${slide === n - 1 ? "disabled" : ""}>${slide < n - 1 ? `${p.next}: ${p.slides[slide + 1]}` : p.next} →</button>`}
+                 <button class="deck-btn primary" data-step="1">${p.next}: ${p.slides[(slide + 1) % n]} →</button>`}
           </div>
           <div class="deck-pdf">${t.pdfLead} <button class="offer-pdf-btn">${linkIcon} ${t.pdfBtn}</button></div>
         </main>
@@ -380,7 +380,8 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
     if (t.closest("[data-back-offer]")) return go(slide, openCard);
 
     const step = t.closest<HTMLElement>("[data-step]");
-    if (step) return go(slide + Number(step.dataset.step));
+    // Next on the last slide loops back to the first.
+    if (step) return go((slide + Number(step.dataset.step) + n) % n);
     const to = t.closest<HTMLElement>("[data-slide]");
     if (to) return go(Number(to.dataset.slide));
     const card = t.closest<HTMLElement>("[data-card]");
@@ -402,7 +403,7 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
     const tag = (e.target as HTMLElement).tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || root.querySelector(".sign-modal")) return;
     if (docsOpen) return;
-    if (e.key === "ArrowRight" && slide < n - 1) go(slide + 1);
+    if (e.key === "ArrowRight") go((slide + 1) % n);
     if (e.key === "ArrowLeft" && slide > 0) go(slide - 1);
   };
   document.addEventListener("keydown", onKey);

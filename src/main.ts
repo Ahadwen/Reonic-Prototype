@@ -1,7 +1,8 @@
 // Entry point: one site for both parts of the case study.
 //   #             home, with a card per part; clicking a card opens its write-up
 //   #components   Part 1, the components list    (#import: the invoice import flow)
-//   #offer/changes  Part 2: the three changes   (#offer: Screen C as provided, #offer/updated: updated)
+//   #offer/changes  Part 2: the three changes   (#offer: Screen C as provided, #offer/updated: updated,
+//                   #offer/post: post-submission redesign)
 // A case-study bar runs across the top of both parts, so they read as two sections of one piece of work.
 
 import { showPart1 } from "./part1.ts";

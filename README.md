@@ -81,7 +81,7 @@ Never commit an API key. The site asks for one at runtime instead.
 | `src/cost.ts` | Token → USD estimate |
 | `src/main.ts` | Router and case-study home page |
 | `src/part1.ts`, `index.html`, `src/style.css` | Part 1 UI: components list, and the upload → processing → review → confirm flow |
-| `src/part2/` | Part 2: Screen C. `original.ts` recreates it as given in the brief; `updated.ts` is the redesign (grouped expandable nav, price breakdown with grant and savings, house illustration linked to the costs, English/German); `art.ts` holds the shared artwork; `index.ts` switches between them with tabs (`#offer`, `#offer/updated`). |
+| `src/part2/` | Part 2: Screen C. `original.ts` recreates it as given in the brief; `updated.ts` is the redesign (grouped expandable nav, price breakdown with grant and savings, house illustration linked to the costs, English/German); `art.ts` holds the shared artwork; `post.ts` is a post-submission redesign (slides with Back/Next, cards for Your system and Your home, call to action always on the right); `index.ts` switches between them with tabs (`#offer/changes`, `#offer`, `#offer/updated`, `#offer/post`). |
 | `scripts/eval-extraction.ts` | Extraction accuracy against `public/samples/*.expected.json` |
 | `scripts/eval-matching.ts` | Matching accuracy against the same files |
 | `scripts/test-review.ts` | Tests for the review step (`npm test`), with the AI step simulated from the expected results |

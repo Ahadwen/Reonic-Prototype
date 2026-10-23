@@ -9,25 +9,25 @@ import { check, house, linkIcon, logo, type Item } from "./art.ts";
 
 export type Lang = "en" | "de";
 
-interface NavGroup { title: string; items: string[]; open: boolean; target?: string }
+export interface NavGroup { title: string; items: string[]; open: boolean; target?: string }
 
-const CUSTOMER = { title: { en: "Mr", de: "Herr" }, surname: "Thompson" };
+export const CUSTOMER = { title: { en: "Mr", de: "Herr" }, surname: "Thompson" };
 const INSTALLER = "Testaccount Hai";
 
 // Illustrative figures for a UK home: solar, battery and an air source heat pump replacing a gas boiler.
-const COSTS: { item: Item | "project"; amount: number }[] = [
+export const COSTS: { item: Item | "project"; amount: number }[] = [
   { item: "solar", amount: 17_900 },
   { item: "battery", amount: 10_800 },
   { item: "heatpump", amount: 27_800 },
   { item: "project", amount: 3_000 },
 ];
-const GRANT = 7_500;
+export const GRANT = 7_500;
 const SAVINGS_PER_YEAR = 2_100;
-const VALID_UNTIL = new Date(2026, 10, 20);
+export const VALID_UNTIL = new Date(2026, 10, 20);
 // The progress tracker shows a completed home survey before the offer.
 const SURVEY_DATE = new Date(2026, 9, 14);
 
-const COPY = {
+export const COPY = {
   en: {
     locale: "en-GB",
     offerTitle: "Your personal offer",
@@ -166,11 +166,11 @@ const COPY = {
   },
 };
 
-function money(n: number, locale: string, decimals = 0) {
+export function money(n: number, locale: string, decimals = 0) {
   return new Intl.NumberFormat(locale, { style: "currency", currency: "GBP", minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(n);
 }
 
-const chevron = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+export const chevron = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 // Which nav groups the customer has opened or closed, kept across language switches.
 const openGroups = new Map<number, boolean>();
@@ -184,7 +184,7 @@ const tick = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 
 
 // The call to action sits under the house illustration, beside the price, and sticks with it
 // while the customer scrolls, so the next step stays in view.
-function renderCta(t: (typeof COPY)[Lang], price: string) {
+export function renderCta(t: (typeof COPY)[Lang], price: string) {
   const date = (d: Date) => new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long" }).format(d);
   // The survey is behind them; the offer is current until they open the signature box, then signing is.
   const current = phase === "accepted" ? 3 : phase === "signing" ? 2 : 1;
@@ -214,7 +214,7 @@ function renderCta(t: (typeof COPY)[Lang], price: string) {
 }
 
 // Signing opens over the page at full size, so it's usable on any screen.
-function renderSignModal(t: (typeof COPY)[Lang]) {
+export function renderSignModal(t: (typeof COPY)[Lang]) {
   if (phase !== "signing") return "";
   return `<div class="sign-modal" role="dialog" aria-modal="true" aria-labelledby="sign-title">
     <div class="sign">
@@ -332,9 +332,10 @@ export function renderUpdated(lang: Lang): string {
 }
 
 // Interaction for the updated screen. Returns nothing; wires listeners on `root`.
-export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
-  const offer = root.querySelector<HTMLElement>(".offer.updated");
-  if (!offer) return;
+// Behaviour shared by the updated screen and the post-submission version: signing, the call to
+// action, the linked product highlight, nav groups and the language switch. Returns a click
+// handler that reports whether it dealt with the event, so each screen can add its own on top.
+export function wireShared(root: HTMLElement, offer: HTMLElement, rerender: (lang: Lang) => void) {
   const currentLang = (offer.getAttribute("lang") ?? "en") as Lang;
   wireSignaturePad(root);
 
@@ -353,8 +354,11 @@ export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
   });
   offer.addEventListener("focusin", (e) => { const i = itemOf(e); if (i) light(i); });
   offer.addEventListener("focusout", () => light(pinned));
+  offer.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && itemOf(e)) { e.preventDefault(); (e.target as Element).dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+  });
 
-  // Call-to-action buttons, in the side panel and in the signing overlay (which sits outside .offer).
+  // Call-to-action buttons, in the panel and in the signing overlay (which sits outside .offer).
   const onCta = (e: Event) => {
     const cta = (e.target as HTMLElement).closest<HTMLElement>("[data-cta]")?.dataset.cta;
     if (!cta || cta === "clear") return false;
@@ -367,11 +371,12 @@ export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
     return true;
   };
   root.querySelector(".sign-modal")?.addEventListener("click", (e) => onCta(e));
-  offer.addEventListener("click", (e) => {
+
+  return (e: Event): boolean => {
     const t = e.target as HTMLElement;
     // Tap to pin on touch screens (no hover); tap again to clear.
     const i = itemOf(e);
-    if (i) { pinned = pinned === i ? null : i; light(pinned ?? i); return; }
+    if (i) { pinned = pinned === i ? null : i; light(pinned ?? i); return true; }
 
     const group = t.closest<HTMLElement>("[data-group]");
     if (group) {
@@ -381,23 +386,35 @@ export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
       box.classList.toggle("open", open);
       group.setAttribute("aria-expanded", String(open));
       openGroups.set(gi, open);
-      return;
+      return true;
     }
     const lang = t.closest<HTMLElement>("[data-lang]")?.dataset.lang as Lang | undefined;
-    if (lang) return rerender(lang);
+    if (lang) { rerender(lang); return true; }
 
-    if (onCta(e)) return;
+    return onCta(e);
+  };
+}
 
-    const navItem = t.closest<HTMLElement>(".nav-items button");
+// Draw attention to the call-to-action panel (from "Next steps › Accept offer" in the nav).
+export function flashCta(root: HTMLElement) {
+  const target = root.querySelector<HTMLElement>("#cta");
+  if (target) { target.classList.remove("flash"); void target.offsetWidth; target.classList.add("flash"); }
+}
+
+// Interaction for the updated screen. Returns nothing; wires listeners on `root`.
+export function wireUpdated(root: HTMLElement, rerender: (lang: Lang) => void) {
+  const offer = root.querySelector<HTMLElement>(".offer.updated");
+  if (!offer) return;
+  const shared = wireShared(root, offer, rerender);
+
+  offer.addEventListener("click", (e) => {
+    if (shared(e)) return;
+    const navItem = (e.target as HTMLElement).closest<HTMLElement>(".nav-items button");
     if (navItem) {
       offer.querySelectorAll(".nav-items button.active").forEach((b) => b.classList.remove("active"));
       navItem.classList.add("active");
       // "Accept offer" points at the panel that's already on screen.
-      const target = navItem.dataset.target ? root.querySelector<HTMLElement>(`#${navItem.dataset.target}`) : null;
-      if (target) { target.classList.remove("flash"); void target.offsetWidth; target.classList.add("flash"); }
+      if (navItem.dataset.target) flashCta(root);
     }
-  });
-  offer.addEventListener("keydown", (e) => {
-    if ((e.key === "Enter" || e.key === " ") && itemOf(e)) { e.preventDefault(); (e.target as Element).dispatchEvent(new MouseEvent("click", { bubbles: true })); }
   });
 }

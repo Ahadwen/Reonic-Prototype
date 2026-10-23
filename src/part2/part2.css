@@ -11,7 +11,7 @@
 .offer-from { font-size: 14px; }
 
 .offer-body { display: grid; grid-template-columns: 300px 1fr; }
-.offer-nav { position: sticky; top: calc((var(--bar-h) + var(--tabs-h)) / var(--zoom, 1)); align-self: start; max-height: 100vh; overflow-y: auto; padding: 28px 20px 28px 26px; display: flex; flex-direction: column; gap: 4px; }
+.offer-nav { position: sticky; top: calc((var(--bar-h) + var(--tabs-h)) / var(--zoom, 1)); align-self: start; max-height: var(--frame-h); overflow-y: auto; padding: 28px 20px 28px 26px; display: flex; flex-direction: column; gap: 4px; }
 .offer-nav button { background: none; border: 0; text-align: left; font: inherit; font-size: 14px; color: #111; padding: 6px 0 6px 2px; cursor: pointer; line-height: 1.45; }
 .offer-nav button.active { color: #f07d00; }
 .offer-nav button.active::before { content: "• "; }
@@ -37,8 +37,10 @@
 .offer-end { border-top: 2px dashed #c4c4c8; margin: 48px 16px 0; padding: 10px 0 48px; text-align: center; }
 .offer-end span { color: #9a9a9a; font-size: 13px; }
 
-/* Always laid out as on a 1440px desktop; part2.ts zooms it out to fit narrower screens. */
-.offer { min-width: 1440px; }
+/* Always laid out as on a 1440px desktop; part2.ts zooms it out to fit narrower screens. --frame-h
+   is the height available below the bars: the real window on desktop, a 900px-high desktop window
+   when zoomed out (set in index.ts), so phones get the desktop proportions rather than tall slides. */
+.offer { min-width: 1440px; --frame-h: calc((100vh - var(--bar-h) - var(--tabs-h)) / var(--zoom, 1)); }
 
 /* ---- Tabs: provided vs updated (outside the zoomed screen) ---- */
 .offer-tabs { position: sticky; top: var(--bar-h); z-index: 10; height: var(--tabs-h); box-sizing: border-box; display: flex; gap: 4px; padding: 8px 16px 0; background: #f4f2ff; border-bottom: 1px solid #ddd6ff; font-family: Inter, system-ui, sans-serif; }
@@ -170,7 +172,7 @@
 .tab-tip { position: absolute; top: calc(100% + 8px); left: 0; z-index: 30; width: 360px; max-width: calc(100vw - 32px); background: #18181b; color: #f4f4f5; font-size: 13px; font-weight: 400; line-height: 1.5; padding: 12px 14px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s, visibility 0.15s; pointer-events: none; white-space: normal; }
 .tab-tip::before { content: ""; position: absolute; top: -6px; left: 24px; width: 12px; height: 12px; background: #18181b; transform: rotate(45deg); }
 .tab-post:hover .tab-tip, .tab-post:focus-visible .tab-tip { opacity: 1; visibility: visible; transform: none; }
-@media (max-width: 760px) { .offer-tabs { overflow-x: auto; } .tab-tip { position: fixed; top: calc(var(--bar-h) + var(--tabs-h) + 8px); left: 16px; } .tab-tip::before { display: none; } }
+@media (max-width: 760px) { .offer-tabs { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; } .offer-tabs a { white-space: nowrap; font-size: 13px; padding: 8px 10px; flex: none; } .offer-tabs .tab-post { margin-left: 2px; } .tab-tip { position: fixed; top: calc(var(--bar-h) + var(--tabs-h) + 8px); left: 16px; } .tab-tip::before { display: none; } }
 
 /* ---- Post submission screen: nav | slides | call to action ---- */
 .offer.post .offer-body { grid-template-columns: 260px minmax(0, 1fr) 380px; }
@@ -186,7 +188,7 @@
 .deck-steps button.current span { background: #f07d00; border-color: #f07d00; color: #fff; }
 .deck-steps button:hover:not(.current) { background: #f4f4f5; }
 
-.slide { min-height: max(480px, calc((100vh - var(--bar-h) - var(--tabs-h)) / var(--zoom, 1) - var(--offer-head-h) - 160px)); border: 1px solid #e6e6e9; border-radius: 18px; padding: 36px 40px; background: #fff; box-shadow: 0 8px 30px rgba(31, 61, 79, 0.06); outline: none; }
+.slide { min-height: max(480px, calc(var(--frame-h) - var(--offer-head-h) - 160px)); border: 1px solid #e6e6e9; border-radius: 18px; padding: 36px 40px; background: #fff; box-shadow: 0 8px 30px rgba(31, 61, 79, 0.06); outline: none; }
 .slide h1 { font-size: 36px; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
 .slide p { font-size: 17px; line-height: 1.6; margin: 0 0 18px; max-width: 760px; }
 .slide-lead { color: #555; }

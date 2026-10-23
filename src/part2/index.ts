@@ -16,6 +16,7 @@ let lastHash = "";
 
 // The screen is shown as it looks on a desktop, scaled down on smaller screens rather than reflowed.
 const DESIGN_WIDTH = 1440;
+const DESIGN_HEIGHT = 900;
 function fitToWidth() {
   const offer = root.querySelector<HTMLElement>(".offer");
   if (!offer) return;
@@ -23,6 +24,9 @@ function fitToWidth() {
   offer.style.zoom = scale < 1 ? String(scale) : "";
   // Sticky offsets inside the screen divide by this, since lengths there are scaled by the zoom.
   offer.style.setProperty("--zoom", String(scale));
+  // Zoomed out, lay out for a desktop-sized window too, so the proportions match the desktop view.
+  if (scale < 1) offer.style.setProperty("--frame-h", `calc(${DESIGN_HEIGHT}px - var(--bar-h) - var(--tabs-h))`);
+  else offer.style.removeProperty("--frame-h");
 }
 window.addEventListener("resize", fitToWidth);
 
@@ -55,4 +59,11 @@ export function showPart2(hash: string) {
   if (updated) wireUpdated(root, rerender);
   if (post) wirePost(root, rerender);
   fitToWidth();
+
+  // On narrow screens the tab strip scrolls sideways; keep the current tab in view.
+  const tabs = root.querySelector<HTMLElement>(".offer-tabs");
+  const active = tabs?.querySelector<HTMLElement>("a.active");
+  if (tabs && active && tabs.scrollWidth > tabs.clientWidth) {
+    tabs.scrollLeft = active.offsetLeft + active.offsetWidth - tabs.clientWidth + 16;
+  }
 }

@@ -193,7 +193,9 @@ function renderNav(lang: Lang) {
   return groups.map(({ group, targets }, gi) => {
     const holdsCurrent = targets.some(inView);
     const open = navOpen.get(gi) ?? (holdsCurrent || group.open);
-    return `<div class="nav-group ${open ? "open" : ""}">
+    // Documents aren't part of the slide sequence, so a divider sets them apart.
+    const apart = AREAS[gi] === "docs" ? "apart" : "";
+    return `<div class="nav-group ${open ? "open" : ""} ${apart}">
       <button class="nav-group-head ${atArea(AREAS[gi]) ? "current" : ""}" data-pgroup="${gi}" aria-expanded="${open}">${chevron}<span>${group.title}</span><span class="nav-count">${group.items.length}</span></button>
       <div class="nav-items">${group.items.map((label, i) => {
         const active = current === `${gi}:${i}`;

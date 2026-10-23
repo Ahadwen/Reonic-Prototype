@@ -22,7 +22,6 @@ const HOME_CARDS: CardId[] = ["building", "household", "heat"];
 const POST = {
   en: {
     slides: ["Welcome", "At a glance", "Costs and savings", "Your system", "Your home"],
-    welcomeKicker: "Your personal offer",
     summary: (price: string, valid: string) => [
       ["Includes", "Solar system · Battery storage · Heat pump"],
       ["Your price", `${price} after the grant`],
@@ -87,7 +86,6 @@ const POST = {
   },
   de: {
     slides: ["Willkommen", "Auf einen Blick", "Kosten und Ersparnis", "Ihre Anlage", "Ihr Zuhause"],
-    welcomeKicker: "Ihr persönliches Angebot",
     summary: (price: string, valid: string) => [
       ["Enthält", "Solaranlage · Batteriespeicher · Wärmepumpe"],
       ["Ihr Preis", `${price} nach Förderung`],
@@ -258,9 +256,7 @@ function renderSlide(lang: Lang) {
 
   switch (slide) {
     case 0: return `
-      <span class="slide-kicker">${p.welcomeKicker}</span>
-      <h1>${t.h1}</h1>
-      <p class="greeting">${t.greeting}</p>
+      <h1 class="greeting">${t.greeting}</h1>
       ${t.intro.map((x) => `<p>${x}</p>`).join("")}
       <dl class="summary-list">${p.summary(price, valid).map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>`;
     case 1: return `

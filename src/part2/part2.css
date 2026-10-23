@@ -189,8 +189,7 @@
 .slide { min-height: max(480px, calc((100vh - var(--bar-h) - var(--tabs-h)) / var(--zoom, 1) - var(--offer-head-h) - 160px)); border: 1px solid #e6e6e9; border-radius: 18px; padding: 36px 40px; background: #fff; box-shadow: 0 8px 30px rgba(31, 61, 79, 0.06); outline: none; }
 .slide h1 { font-size: 36px; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
 .slide p { font-size: 17px; line-height: 1.6; margin: 0 0 18px; max-width: 760px; }
-.slide-kicker { display: inline-block; color: #f07d00; font-weight: 600; font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 8px; }
-.slide .greeting { font-size: 20px; font-weight: 600; margin-top: 8px; }
+.slide h1.greeting { margin-bottom: 22px; }
 .slide-lead { color: #555; }
 .summary-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px 0 0; }
 .summary-list div { background: #f2f6f8; border-radius: 12px; padding: 14px 16px; }

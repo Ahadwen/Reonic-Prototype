@@ -175,6 +175,13 @@ function navGroups(lang: Lang): { group: NavGroup; targets: Target[] }[] {
   ];
 }
 
+// Each nav group heading leads to the root of its area, in the same order as navGroups().
+type Area = { slide: number } | "docs" | "cta";
+const AREAS: Area[] = [{ slide: 0 }, { slide: 2 }, { slide: 3 }, { slide: 4 }, "cta", "docs"];
+const atArea = (a: Area) => a === "cta" ? false
+  : a === "docs" ? docsOpen && openDoc === null
+  : !docsOpen && slide === a.slide && openCard === null;
+
 const isCurrent = (t: Target) => {
   if (t === null || t === "cta") return false;
   if ("doc" in t) return docsOpen && openDoc === t.doc;
@@ -191,7 +198,7 @@ function renderNav(lang: Lang) {
     const holdsCurrent = targets.some(inView);
     const open = navOpen.get(gi) ?? (holdsCurrent || group.open);
     return `<div class="nav-group ${open ? "open" : ""}">
-      <button class="nav-group-head" data-pgroup="${gi}" aria-expanded="${open}">${chevron}<span>${group.title}</span><span class="nav-count">${group.items.length}</span></button>
+      <button class="nav-group-head ${atArea(AREAS[gi]) ? "current" : ""}" data-pgroup="${gi}" aria-expanded="${open}">${chevron}<span>${group.title}</span><span class="nav-count">${group.items.length}</span></button>
       <div class="nav-items">${group.items.map((label, i) => {
         const active = current === `${gi}:${i}`;
         return `<button class="${active ? "active" : ""} ${targets[i] === null ? "no-slide" : ""}" data-pnav="${gi}:${i}" ${active ? `aria-current="true"` : ""}>${label}</button>`;
@@ -348,16 +355,6 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
 
   offer.addEventListener("click", (e) => {
     const t = e.target as HTMLElement;
-    const pgroup = t.closest<HTMLElement>("[data-pgroup]");
-    if (pgroup) {
-      const gi = Number(pgroup.dataset.pgroup);
-      const box = pgroup.parentElement!;
-      const open = !box.classList.contains("open");
-      box.classList.toggle("open", open);
-      pgroup.setAttribute("aria-expanded", String(open));
-      navOpen.set(gi, open);
-      return;
-    }
     if (shared(e)) return;
 
     // Documents: open the view (optionally at one document), move between list and document, leave.
@@ -368,6 +365,23 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
       root.querySelector<HTMLElement>(".slide")?.focus({ preventScroll: true });
     };
     if (t.closest("[data-open-docs]")) return showDocs(null);
+
+    // A group heading opens its list and goes to the root of its area. Clicking it again while
+    // already there (or on Next steps, which has no page) just opens or closes the list.
+    const pgroup = t.closest<HTMLElement>("[data-pgroup]");
+    if (pgroup) {
+      const gi = Number(pgroup.dataset.pgroup);
+      const area = AREAS[gi];
+      const isOpen = pgroup.parentElement!.classList.contains("open");
+      if (area === "cta" || (isOpen && atArea(area))) {
+        navOpen.set(gi, !isOpen);
+        rerender(lang);
+        if (area === "cta") flashCta(root);
+        return;
+      }
+      navOpen.set(gi, true);
+      return area === "docs" ? showDocs(null) : go(area.slide);
+    }
     const doc = t.closest<HTMLElement>("[data-doc]");
     if (doc) return showDocs(Number(doc.dataset.doc));
     if (t.closest("[data-close-doc]")) return showDocs(null);

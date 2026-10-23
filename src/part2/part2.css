@@ -255,3 +255,4 @@
 .doc-actions .deck-btn { display: inline-flex; gap: 8px; align-items: center; }
 .doc-actions .deck-btn svg { width: 16px; height: 16px; }
 .doc-actions .hint { color: #888; font-size: 13px; }
+.offer.post .nav-group-head.current span:not(.nav-count) { color: #c45f00; }

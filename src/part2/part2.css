@@ -240,3 +240,18 @@
 
 .cta-rail { padding: 24px 20px 24px 0; }
 .offer.post .cta-panel { position: sticky; top: calc((var(--bar-h) + var(--tabs-h)) / var(--zoom, 1) + 24px); margin-top: 0; grid-template-columns: 1fr; }
+
+/* Documents: link in the call-to-action panel, and the document cards in the slide area */
+.docs-link { background: none; border: 0; border-top: 1px solid #ececef; padding: 12px 0 0; margin: 0; font: inherit; font-size: 14px; font-weight: 600; color: #1f3d4f; text-align: left; cursor: pointer; }
+.docs-link:hover, .docs-link.active { color: #c45f00; }
+.card-grid.docs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.doc-card { min-height: 0; flex-direction: row; align-items: flex-start; gap: 14px; padding: 14px 16px; }
+.doc-icon { flex: none; font-size: 11px !important; font-weight: 700; color: #b42318 !important; border: 1.5px solid #e6a6a0; border-radius: 6px; padding: 6px 6px; letter-spacing: 0.04em; margin-top: 2px; }
+.doc-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.doc-text b { font-size: 15.5px; }
+.doc-text span { color: #555; font-size: 13.5px; line-height: 1.4; }
+.doc-text em { font-style: normal; color: #777; font-size: 12.5px; margin-top: 2px !important; }
+.doc-actions { display: flex; gap: 14px; align-items: center; }
+.doc-actions .deck-btn { display: inline-flex; gap: 8px; align-items: center; }
+.doc-actions .deck-btn svg { width: 16px; height: 16px; }
+.doc-actions .hint { color: #888; font-size: 13px; }

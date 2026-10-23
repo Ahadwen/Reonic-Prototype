@@ -37,6 +37,24 @@ const POST = {
     open: "Open",
     of: (i: number, n: number) => `${i} of ${n}`,
     overview: ["Welcome", "At a glance"],
+    docsLink: (n: number) => `See your documents (${n})`,
+    docsTitle: "Your documents",
+    docsLead: "Datasheets, the MCS paperwork and the survey results. Open one to see what's in it.",
+    backToOffer: "Back to the offer",
+    backToDocs: "Back to your documents",
+    download: "Download PDF",
+    demoNote: "Demo: no file is attached.",
+    docFacts: ["Format", "Prepared by", "Date"],
+    docs: [
+      ["Manufacturer datasheets for every component in the offer.", "PDF bundle · 6 files"],
+      ["Expected efficiency and running costs of the heat pump, in the MCS format.", "PDF · 4 pages"],
+      ["Noise at the nearest neighbouring window, checked against the MCS limit.", "PDF · 2 pages"],
+      ["Contract terms, warranties and what MCS certification covers.", "PDF · 3 pages"],
+      ["Expected yearly yield of the solar system, in the MCS format.", "PDF · 2 pages"],
+      ["Room-by-room heat loss, and the radiators being upgraded.", "PDF · 6 pages"],
+      ["The heat pump model proposed, and how it was sized.", "PDF · 2 pages"],
+      ["Shading on the roof through the year.", "PDF · 1 page"],
+    ] as [string, string][],
     cards: {
       solar: { title: "Solar system", summary: "8.8 kWp on the south-facing roof",
         facts: [["Panels", "20 × 440 W, all black"], ["Peak output", "8.8 kWp"], ["Roof", "South-facing, 35° pitch"], ["Inverter", "Hybrid, 5 kW"]],
@@ -84,6 +102,24 @@ const POST = {
     open: "Öffnen",
     of: (i: number, n: number) => `${i} von ${n}`,
     overview: ["Willkommen", "Auf einen Blick"],
+    docsLink: (n: number) => `Ihre Dokumente ansehen (${n})`,
+    docsTitle: "Ihre Dokumente",
+    docsLead: "Datenblätter, die MCS-Unterlagen und die Ergebnisse des Vor-Ort-Termins. Öffnen Sie ein Dokument, um den Inhalt zu sehen.",
+    backToOffer: "Zurück zum Angebot",
+    backToDocs: "Zurück zu Ihren Dokumenten",
+    download: "PDF herunterladen",
+    demoNote: "Demo: keine Datei hinterlegt.",
+    docFacts: ["Format", "Erstellt von", "Datum"],
+    docs: [
+      ["Herstellerdatenblätter zu allen Komponenten im Angebot.", "PDF-Paket · 6 Dateien"],
+      ["Erwartete Effizienz und Betriebskosten der Wärmepumpe im MCS-Format.", "PDF · 4 Seiten"],
+      ["Schallpegel am nächsten Nachbarfenster, geprüft gegen den MCS-Grenzwert.", "PDF · 2 Seiten"],
+      ["Vertragsbedingungen, Garantien und was die MCS-Zertifizierung abdeckt.", "PDF · 3 Seiten"],
+      ["Erwarteter Jahresertrag der Solaranlage im MCS-Format.", "PDF · 2 Seiten"],
+      ["Raumweise Heizlast und die Heizkörper, die getauscht werden.", "PDF · 6 Seiten"],
+      ["Das vorgeschlagene Wärmepumpenmodell und seine Auslegung.", "PDF · 2 Seiten"],
+      ["Verschattung des Dachs im Jahresverlauf.", "PDF · 1 Seite"],
+    ] as [string, string][],
     cards: {
       solar: { title: "Solaranlage", summary: "8,8 kWp auf dem Süddach",
         facts: [["Module", "20 × 440 W, komplett schwarz"], ["Spitzenleistung", "8,8 kWp"], ["Dach", "Südausrichtung, 35° Neigung"], ["Wechselrichter", "Hybrid, 5 kW"]],
@@ -119,10 +155,13 @@ const POST = {
 // Which slide and card are showing; kept across language switches and tab changes.
 let slide = 0;
 let openCard: CardId | null = null;
+// The documents view replaces the slides until the customer goes back to the offer.
+let docsOpen = false;
+let openDoc: number | null = null;
 const navOpen = new Map<number, boolean>();
 
-// Nav groups map onto slides and cards: [slide, card] per item, or null for items with no slide.
-type Target = { slide: number; card?: CardId } | "cta" | null;
+// Nav groups map onto slides and cards, documents, or the call to action.
+type Target = { slide: number; card?: CardId } | { doc: number } | "cta" | null;
 function navGroups(lang: Lang): { group: NavGroup; targets: Target[] }[] {
   const base = COPY[lang].nav;
   return [
@@ -132,11 +171,16 @@ function navGroups(lang: Lang): { group: NavGroup; targets: Target[] }[] {
     { group: base[1], targets: SYSTEM_CARDS.map((card) => ({ slide: 3, card })) },
     { group: base[2], targets: HOME_CARDS.map((card) => ({ slide: 4, card })) },
     { group: base[4], targets: ["cta"] },
-    { group: base[5], targets: base[5].items.map(() => null) },
+    { group: base[5], targets: base[5].items.map((_, doc) => ({ doc })) },
   ];
 }
 
-const isCurrent = (t: Target) => t !== null && t !== "cta" && t.slide === slide && (t.card ?? null) === (openCard ?? null);
+const isCurrent = (t: Target) => {
+  if (t === null || t === "cta") return false;
+  if ("doc" in t) return docsOpen && openDoc === t.doc;
+  return !docsOpen && t.slide === slide && (t.card ?? null) === (openCard ?? null);
+};
+const inView = (t: Target) => t !== null && t !== "cta" && ("doc" in t ? docsOpen : !docsOpen && t.slide === slide);
 
 function renderNav(lang: Lang) {
   const groups = navGroups(lang);
@@ -144,7 +188,7 @@ function renderNav(lang: Lang) {
   const gi0 = groups.findIndex((g) => g.targets.some(isCurrent));
   const current = gi0 < 0 ? "" : `${gi0}:${groups[gi0].targets.findIndex(isCurrent)}`;
   return groups.map(({ group, targets }, gi) => {
-    const holdsCurrent = targets.some((t) => t !== null && t !== "cta" && t.slide === slide);
+    const holdsCurrent = targets.some(inView);
     const open = navOpen.get(gi) ?? (holdsCurrent || group.open);
     return `<div class="nav-group ${open ? "open" : ""}">
       <button class="nav-group-head" data-pgroup="${gi}" aria-expanded="${open}">${chevron}<span>${group.title}</span><span class="nav-count">${group.items.length}</span></button>
@@ -154,6 +198,29 @@ function renderNav(lang: Lang) {
       }).join("")}</div>
     </div>`;
   }).join("");
+}
+
+function renderDocs(lang: Lang) {
+  const p = POST[lang];
+  const names = COPY[lang].nav[5].items;
+  if (openDoc !== null) {
+    const [desc, format] = p.docs[openDoc];
+    const date = new Intl.DateTimeFormat(COPY[lang].locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(2026, 9, 16));
+    return `<div class="card-open">
+      <button class="card-back" data-close-doc>← ${p.backToDocs}</button>
+      <h2>${names[openDoc]}</h2>
+      <p class="card-open-lead">${desc}</p>
+      <dl class="facts">${[[p.docFacts[0], format], [p.docFacts[1], COPY[lang].from.replace(/^\S+ /, "")], [p.docFacts[2], date]].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
+      <div class="doc-actions"><button class="deck-btn primary" data-doc-download>↓ ${p.download}</button><span class="hint">${p.demoNote}</span></div>
+    </div>`;
+  }
+  return `<h1>${p.docsTitle}</h1>
+    <p class="slide-lead">${p.docsLead}</p>
+    <div class="card-grid docs">${names.map((name, i) => `
+      <button class="info-card doc-card" data-doc="${i}">
+        <span class="doc-icon" aria-hidden="true">PDF</span>
+        <span class="doc-text"><b>${name}</b><em>${p.docs[i][1]}</em></span>
+      </button>`).join("")}</div>`;
 }
 
 function renderCards(lang: Lang, ids: CardId[], parent: string) {
@@ -242,16 +309,22 @@ export function renderPost(lang: Lang): string {
       <div class="offer-body">
         <nav class="offer-nav grouped">${renderNav(lang)}</nav>
         <main class="deck">
-          <ol class="deck-steps">${p.slides.map((label, i) => `<li><button data-slide="${i}" class="${i === slide ? "current" : i < slide ? "seen" : ""}" ${i === slide ? `aria-current="step"` : ""}><span>${i + 1}</span>${label}</button></li>`).join("")}</ol>
-          <section class="slide" tabindex="-1" aria-live="polite" aria-label="${p.slides[slide]}">${renderSlide(lang)}</section>
+          <ol class="deck-steps">${p.slides.map((label, i) => {
+            const cls = docsOpen ? "" : i === slide ? "current" : i < slide ? "seen" : "";
+            return `<li><button data-slide="${i}" class="${cls}" ${!docsOpen && i === slide ? `aria-current="step"` : ""}><span>${i + 1}</span>${label}</button></li>`;
+          }).join("")}</ol>
+          <section class="slide" tabindex="-1" aria-live="polite" aria-label="${docsOpen ? p.docsTitle : p.slides[slide]}">${docsOpen ? renderDocs(lang) : renderSlide(lang)}</section>
           <div class="deck-controls">
-            <button class="deck-btn" data-step="-1" ${slide === 0 ? "disabled" : ""}>← ${p.back}</button>
-            <span class="deck-count">${p.of(slide + 1, n)}</span>
-            <button class="deck-btn primary" data-step="1" ${slide === n - 1 ? "disabled" : ""}>${slide < n - 1 ? `${p.next}: ${p.slides[slide + 1]}` : p.next} →</button>
+            ${docsOpen
+              ? `<button class="deck-btn" data-back-offer>← ${p.backToOffer}: ${p.slides[slide]}</button>`
+              : `<button class="deck-btn" data-step="-1" ${slide === 0 ? "disabled" : ""}>← ${p.back}</button>
+                 <span class="deck-count">${p.of(slide + 1, n)}</span>
+                 <button class="deck-btn primary" data-step="1" ${slide === n - 1 ? "disabled" : ""}>${slide < n - 1 ? `${p.next}: ${p.slides[slide + 1]}` : p.next} →</button>`}
           </div>
           <div class="deck-pdf">${t.pdfLead} <button class="offer-pdf-btn">${linkIcon} ${t.pdfBtn}</button></div>
         </main>
-        <aside class="cta-rail">${renderCta(t, money(total - GRANT, t.locale, 2))}</aside>
+        <aside class="cta-rail">${renderCta(t, money(total - GRANT, t.locale, 2),
+          `<button class="docs-link ${docsOpen ? "active" : ""}" data-open-docs>${p.docsLink(p.docs.length)} →</button>`)}</aside>
       </div>
     </div>
     ${renderSignModal(t)}`;
@@ -267,6 +340,8 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
   const go = (to: number, card: CardId | null = null) => {
     slide = Math.max(0, Math.min(n - 1, to));
     openCard = card;
+    docsOpen = false;
+    openDoc = null;
     rerender(lang);
     root.querySelector<HTMLElement>(".slide")?.focus({ preventScroll: true });
   };
@@ -285,6 +360,19 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
     }
     if (shared(e)) return;
 
+    // Documents: open the view (optionally at one document), move between list and document, leave.
+    const showDocs = (doc: number | null) => {
+      docsOpen = true;
+      openDoc = doc;
+      rerender(lang);
+      root.querySelector<HTMLElement>(".slide")?.focus({ preventScroll: true });
+    };
+    if (t.closest("[data-open-docs]")) return showDocs(null);
+    const doc = t.closest<HTMLElement>("[data-doc]");
+    if (doc) return showDocs(Number(doc.dataset.doc));
+    if (t.closest("[data-close-doc]")) return showDocs(null);
+    if (t.closest("[data-back-offer]")) return go(slide, openCard);
+
     const step = t.closest<HTMLElement>("[data-step]");
     if (step) return go(slide + Number(step.dataset.step));
     const to = t.closest<HTMLElement>("[data-slide]");
@@ -298,6 +386,7 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
       const [gi, i] = nav.dataset.pnav!.split(":").map(Number);
       const target = navGroups(lang)[gi].targets[i];
       if (target === "cta") return flashCta(root);
+      if (target && "doc" in target) return showDocs(target.doc);
       if (target) return go(target.slide, target.card ?? null);
     }
   });
@@ -307,6 +396,7 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
     if (!document.contains(offer) || root.hidden) return document.removeEventListener("keydown", onKey);
     const tag = (e.target as HTMLElement).tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || root.querySelector(".sign-modal")) return;
+    if (docsOpen) return;
     if (e.key === "ArrowRight" && slide < n - 1) go(slide + 1);
     if (e.key === "ArrowLeft" && slide > 0) go(slide - 1);
   };

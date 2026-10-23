@@ -184,7 +184,8 @@ const tick = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 
 
 // The call to action sits under the house illustration, beside the price, and sticks with it
 // while the customer scrolls, so the next step stays in view.
-export function renderCta(t: (typeof COPY)[Lang], price: string) {
+// `extra` is appended at the foot of the panel (the post-submission screen adds a documents link).
+export function renderCta(t: (typeof COPY)[Lang], price: string, extra = "") {
   const date = (d: Date) => new Intl.DateTimeFormat(t.locale, { day: "numeric", month: "long" }).format(d);
   // The survey is behind them; the offer is current until they open the signature box, then signing is.
   const current = phase === "accepted" ? 3 : phase === "signing" ? 2 : 1;
@@ -210,6 +211,7 @@ export function renderCta(t: (typeof COPY)[Lang], price: string) {
     <ol class="offer-steps">${steps}</ol>
     <div class="cta-actions">${actions}</div>
     <p class="validity">${t.validity(validUntil)}</p>
+    ${extra}
   </section>`;
 }
 

@@ -6,7 +6,7 @@
 
 import { check, house, linkIcon, logo, type Item } from "./art.ts";
 import {
-  chevron, COPY, COSTS, flashCta, GRANT, money, renderCta, renderSignModal, VALID_UNTIL, wireShared,
+  chevron, COPY, COSTS, GRANT, money, renderCta, renderSignModal, VALID_UNTIL, wireShared,
   type Lang, type NavGroup,
 } from "./updated.ts";
 
@@ -160,8 +160,9 @@ let docsOpen = false;
 let openDoc: number | null = null;
 const navOpen = new Map<number, boolean>();
 
-// Nav groups map onto slides and cards, documents, or the call to action.
-type Target = { slide: number; card?: CardId } | { doc: number } | "cta" | null;
+// Nav groups map onto slides and cards, or documents. "Next steps" isn't here: the
+// call-to-action panel is always on screen and covers it.
+type Target = { slide: number; card?: CardId } | { doc: number } | null;
 function navGroups(lang: Lang): { group: NavGroup; targets: Target[] }[] {
   const base = COPY[lang].nav;
   return [
@@ -170,24 +171,21 @@ function navGroups(lang: Lang): { group: NavGroup; targets: Target[] }[] {
     { group: base[3], targets: base[3].items.map(() => ({ slide: 2 })) },
     { group: base[1], targets: SYSTEM_CARDS.map((card) => ({ slide: 3, card })) },
     { group: base[2], targets: HOME_CARDS.map((card) => ({ slide: 4, card })) },
-    { group: base[4], targets: ["cta"] },
     { group: base[5], targets: base[5].items.map((_, doc) => ({ doc })) },
   ];
 }
 
 // Each nav group heading leads to the root of its area, in the same order as navGroups().
-type Area = { slide: number } | "docs" | "cta";
-const AREAS: Area[] = [{ slide: 0 }, { slide: 2 }, { slide: 3 }, { slide: 4 }, "cta", "docs"];
-const atArea = (a: Area) => a === "cta" ? false
-  : a === "docs" ? docsOpen && openDoc === null
-  : !docsOpen && slide === a.slide && openCard === null;
+type Area = { slide: number } | "docs";
+const AREAS: Area[] = [{ slide: 0 }, { slide: 2 }, { slide: 3 }, { slide: 4 }, "docs"];
+const atArea = (a: Area) => a === "docs" ? docsOpen && openDoc === null : !docsOpen && slide === a.slide && openCard === null;
 
 const isCurrent = (t: Target) => {
-  if (t === null || t === "cta") return false;
+  if (t === null) return false;
   if ("doc" in t) return docsOpen && openDoc === t.doc;
   return !docsOpen && t.slide === slide && (t.card ?? null) === (openCard ?? null);
 };
-const inView = (t: Target) => t !== null && t !== "cta" && ("doc" in t ? docsOpen : !docsOpen && t.slide === slide);
+const inView = (t: Target) => t !== null && ("doc" in t ? docsOpen : !docsOpen && t.slide === slide);
 
 function renderNav(lang: Lang) {
   const groups = navGroups(lang);
@@ -367,17 +365,15 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
     if (t.closest("[data-open-docs]")) return showDocs(null);
 
     // A group heading opens its list and goes to the root of its area. Clicking it again while
-    // already there (or on Next steps, which has no page) just opens or closes the list.
+    // already there just opens or closes the list.
     const pgroup = t.closest<HTMLElement>("[data-pgroup]");
     if (pgroup) {
       const gi = Number(pgroup.dataset.pgroup);
       const area = AREAS[gi];
       const isOpen = pgroup.parentElement!.classList.contains("open");
-      if (area === "cta" || (isOpen && atArea(area))) {
-        navOpen.set(gi, !isOpen);
-        rerender(lang);
-        if (area === "cta") flashCta(root);
-        return;
+      if (isOpen && atArea(area)) {
+        navOpen.set(gi, false);
+        return rerender(lang);
       }
       navOpen.set(gi, true);
       return area === "docs" ? showDocs(null) : go(area.slide);
@@ -399,7 +395,6 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
     if (nav) {
       const [gi, i] = nav.dataset.pnav!.split(":").map(Number);
       const target = navGroups(lang)[gi].targets[i];
-      if (target === "cta") return flashCta(root);
       if (target && "doc" in target) return showDocs(target.doc);
       if (target) return go(target.slide, target.card ?? null);
     }

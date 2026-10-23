@@ -55,7 +55,10 @@ npm run supabase -- migrate
 npm run supabase -- secret ANTHROPIC_API_KEY
 npm run supabase -- deploy claude-proxy
 npm run supabase -- sql "select * from reonic_api_usage"
+npm run visits                      # visits to the live site per day (reonic_visits)
 ```
+
+`reonic_visits` is a plain counter: each page load on the live site adds one to today's row (first and last visit times kept), with no information about the visitor. Local development isn't counted.
 
 Behind a proxy that Node's `fetch` ignores, prefix these with `NODE_USE_ENV_PROXY=1`.
 

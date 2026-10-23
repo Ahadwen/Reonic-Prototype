@@ -11,6 +11,7 @@
     "eval": "tsx scripts/eval-extraction.ts",
     "eval:match": "tsx scripts/eval-matching.ts",
     "supabase": "tsx scripts/supabase.ts",
+    "visits": "tsx scripts/supabase.ts sql \"select day, visits, first_at, last_at from reonic_visits order by day desc\"",
     "test": "tsx --test scripts/test-*.ts"
   },
   "devDependencies": {

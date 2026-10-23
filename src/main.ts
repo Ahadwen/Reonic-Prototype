@@ -8,6 +8,7 @@
 import { showPart1 } from "./part1.ts";
 import { showPart2 } from "./part2/index.ts";
 import { downloadBundle } from "./samples.ts";
+import { countVisit } from "./visits.ts";
 
 const bar = document.getElementById("case-bar")!;
 const home = document.getElementById("home")!;
@@ -185,3 +186,4 @@ bar.addEventListener("click", async (e) => {
 
 window.addEventListener("hashchange", route);
 route();
+countVisit();

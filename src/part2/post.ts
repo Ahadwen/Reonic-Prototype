@@ -194,7 +194,8 @@ function renderNav(lang: Lang) {
   const current = gi0 < 0 ? "" : `${gi0}:${groups[gi0].targets.findIndex(isCurrent)}`;
   return groups.map(({ group, targets }, gi) => {
     const holdsCurrent = targets.some(inView);
-    const open = navOpen.get(gi) ?? (holdsCurrent || group.open);
+    // The group for what's on screen is open and the others closed, unless toggled by hand since.
+    const open = navOpen.get(gi) ?? holdsCurrent;
     // Documents aren't part of the slide sequence, so a divider sets them apart.
     const apart = AREAS[gi] === "docs" ? "apart" : "";
     return `<div class="nav-group ${open ? "open" : ""} ${apart}">
@@ -380,6 +381,7 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
     openCard = card;
     docsOpen = false;
     openDoc = null;
+    navOpen.clear();
     rerender(lang);
     root.querySelector<HTMLElement>(".slide")?.focus({ preventScroll: true });
   };
@@ -392,6 +394,7 @@ export function wirePost(root: HTMLElement, rerender: (lang: Lang) => void) {
     const showDocs = (doc: number | null) => {
       docsOpen = true;
       openDoc = doc;
+      navOpen.clear();
       rerender(lang);
       root.querySelector<HTMLElement>(".slide")?.focus({ preventScroll: true });
     };

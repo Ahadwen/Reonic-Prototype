@@ -126,10 +126,11 @@ type Target = { slide: number; card?: CardId } | "cta" | null;
 function navGroups(lang: Lang): { group: NavGroup; targets: Target[] }[] {
   const base = COPY[lang].nav;
   return [
+    // Same order as the slides: welcome and at a glance, costs, your system, your home.
     { group: { ...base[0], items: POST[lang].overview }, targets: [{ slide: 0 }, { slide: 1 }] },
+    { group: base[3], targets: base[3].items.map(() => ({ slide: 2 })) },
     { group: base[1], targets: SYSTEM_CARDS.map((card) => ({ slide: 3, card })) },
     { group: base[2], targets: HOME_CARDS.map((card) => ({ slide: 4, card })) },
-    { group: base[3], targets: base[3].items.map(() => ({ slide: 2 })) },
     { group: base[4], targets: ["cta"] },
     { group: base[5], targets: base[5].items.map(() => null) },
   ];

@@ -8,7 +8,7 @@ import { renderOriginal } from "./original.ts";
 import { renderPost, wirePost } from "./post.ts";
 import { renderUpdated, wireUpdated, type Lang } from "./updated.ts";
 
-const POST_NOTE = "Limiting the changes to three tangible changes resulted in a page very similar to that which was presented, but I'm not satisfied, so I've decided to play with the design further. This was done after the submission date but it was on my mind. Feel free to disregard or not, as you see fit.";
+const POST_NOTE = "Keeping to three tangible changes left the page very close to the original, and I wasn’t satisfied with that. It stayed on my mind after the submission date, so I continued exploring the design in a separate tab from the previously submitted work.";
 
 const root = document.getElementById("part2")!;
 let lang: Lang = "en";

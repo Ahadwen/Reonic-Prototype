@@ -127,8 +127,8 @@ function renderHome() {
   home.innerHTML = `
     <header class="home-band">
       <div class="home-inner">
-        <div class="eyebrow">Reonic · Product Management case study</div>
-        <h1>Two parts, one prototype</h1>
+        <div class="eyebrow">Reonic</div>
+        <h1>Product Management case study</h1>
         <p>Part 1 is a working prototype for the component database problem. Part 2 takes one screen apart and puts it back together.</p>
       </div>
     </header>

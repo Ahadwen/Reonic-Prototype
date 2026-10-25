@@ -11,7 +11,8 @@
     "eval": "tsx scripts/eval-extraction.ts",
     "eval:match": "tsx scripts/eval-matching.ts",
     "supabase": "tsx scripts/supabase.ts",
-    "visits": "tsx scripts/supabase.ts sql \"select day, visits, first_at, last_at from reonic_visits order by day desc\"",
+    "visits": "tsx scripts/supabase.ts sql \"select to_char(at at time zone 'Europe/London', 'YYYY-MM-DD HH24:MI') as uk_time, time_zone from reonic_visit_log order by at desc limit 100\"",
+    "visits:daily": "tsx scripts/supabase.ts sql \"select day, visits, first_at, last_at from reonic_visits order by day desc\"",
     "test": "tsx --test scripts/test-*.ts"
   },
   "devDependencies": {
